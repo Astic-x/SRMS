@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SRMS – Admin Dashboard</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="CSS/admin.css" />
+</head>
+
+<body>
+
+  <!-- ─── Sidebar ─── -->
+  <aside>
+    <div class="logo">
+      <h1>SRMS</h1>
+      <p>Student Record Management System</p>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="navigate('dashboard',this)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="navigate('students',this)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        Students
+      </div>
+      <div class="nav-item" onclick="navigate('faculty',this)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="5" />
+          <path d="M20 21a8 8 0 1 0-16 0" />
+        </svg>
+        Faculty
+      </div>
+      <div class="nav-item" onclick="navigate('courses',this)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        </svg>
+        Courses
+      </div>
+      <div class="nav-item" onclick="navigate('marks',this)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10 9 9 9 8 9" />
+        </svg>
+        Marks / Grades
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Management</div>
+      <div class="nav-item" onclick="navigate('departments',this)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+        Departments
+      </div>
+      <div class="nav-item" onclick="navigate('settings',this)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+        </svg>
+        Settings
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar">AD</div>
+      <div class="avatar-info">
+        <div class="name">Admin</div>
+        <div class="role">Super Administrator</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── Main ─── -->
+  <main>
+    <div class="topbar">
+      <h2 id="page-title">Dashboard</h2>
+      <div class="topbar-actions">
+        <button class="btn-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg><span class="badge"></span></button>
+        <button id="main-add-btn" class="btn-primary" onclick="openAddModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Student
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div id="page-dashboard" class="page active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+                stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg></div>
+            <div class="stat-body">
+              <div class="label">Total Students</div>
+              <div class="value">1,248</div>
+              <div class="change up">↑ 24 this semester</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a"
+                stroke-width="2">
+                <circle cx="12" cy="8" r="5" />
+                <path d="M20 21a8 8 0 1 0-16 0" />
+              </svg></div>
+            <div class="stat-body">
+              <div class="label">Faculty Members</div>
+              <div class="value">84</div>
+              <div class="change up">↑ 3 new this month</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ea580c"
+                stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+              </svg></div>
+            <div class="stat-body">
+              <div class="label">Departments</div>
+              <div class="value">6</div>
+              <div class="change neutral">No change</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626"
+                stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg></div>
+            <div class="stat-body">
+              <div class="label">Avg. Attendance</div>
+              <div class="value">87%</div>
+              <div class="change down">↓ 2% vs last week</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-header">
+              <span class="chart-title">Enrollment by Branch</span>
+              <select class="select-sm">
+                <option>2024–25</option>
+                <option>2023–24</option>
+                <option>2022–23</option>
+              </select>
+            </div>
+            <div class="chart-wrap"><canvas id="enrollChart"></canvas></div>
+            <div style="display:flex;gap:16px;margin-top:14px;font-size:12px;font-weight:600;">
+              <span style="display:flex;align-items:center;gap:5px;"><span
+                  style="width:10px;height:10px;border-radius:3px;background:#2563eb;display:inline-block;"></span>Active</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span
+                  style="width:10px;height:10px;border-radius:3px;background:#cbd5e1;display:inline-block;"></span>Inactive</span>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header"><span class="chart-title">Branch Breakdown</span></div>
+            <div class="activity-list" style="margin-top:4px;">
+              <div class="branch-row"><span class="branch-name">CSE</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:78%;background:#2563eb"></div>
+                </div><span class="branch-count">380</span>
+              </div>
+              <div class="branch-row"><span class="branch-name">ECE</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:54%;background:#7c3aed"></div>
+                </div><span class="branch-count">218</span>
+              </div>
+              <div class="branch-row"><span class="branch-name">ME</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:47%;background:#0891b2"></div>
+                </div><span class="branch-count">195</span>
+              </div>
+              <div class="branch-row"><span class="branch-name">Civil</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:42%;background:#16a34a"></div>
+                </div><span class="branch-count">175</span>
+              </div>
+              <div class="branch-row"><span class="branch-name">IT</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:38%;background:#ea580c"></div>
+                </div><span class="branch-count">160</span>
+              </div>
+              <div class="branch-row"><span class="branch-name">BT</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:26%;background:#db2777"></div>
+                </div><span class="branch-count">120</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Recent Activity</span></div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#16a34a"></div>
+              <div>
+                <div class="activity-text">New student <b>Riya Sharma</b> registered in CSE department.</div>
+                <div class="activity-time">2 minutes ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#2563eb"></div>
+              <div>
+                <div class="activity-text">Faculty <b>Dr. Anand Mehta</b> updated marks for CS301.</div>
+                <div class="activity-time">18 minutes ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#ea580c"></div>
+              <div>
+                <div class="activity-text">Department <b>IT</b> course list was updated by Admin.</div>
+                <div class="activity-time">1 hour ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#dc2626"></div>
+              <div>
+                <div class="activity-text">Student <b>Arjun Rawat</b> was marked inactive.</div>
+                <div class="activity-time">3 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#7c3aed"></div>
+              <div>
+                <div class="activity-text">New course <b>Machine Learning (CS410)</b> added to CSE department.</div>
+                <div class="activity-time">Yesterday</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STUDENTS ═══ -->
+      <div id="page-students" class="page">
+        <div class="section-header">
+          <h3>Students</h3>
+          <div class="search-wrap">
+            <input type="text" class="search-input" placeholder="🔍 Search students..."
+              oninput="filterTable('students-tbody',this.value)">
+            <button class="btn-primary" onclick="openAddModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Add Student
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Roll No.</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Semester</th>
+                <th>Attendance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody">
+              <tr>
+                <td>CSE2021001</td>
+                <td><b>Aarav Sharma</b></td>
+                <td>CSE</td>
+                <td>6th</td>
+                <td>91%</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('student','Aarav Sharma')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Aarav Sharma')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>ECE2021042</td>
+                <td><b>Priya Rawat</b></td>
+                <td>ECE</td>
+                <td>6th</td>
+                <td>78%</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('student','Priya Rawat')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Priya Rawat')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>ME2022015</td>
+                <td><b>Rohan Bisht</b></td>
+                <td>ME</td>
+                <td>4th</td>
+                <td>65%</td>
+                <td><span class="tag inactive">Inactive</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('student','Rohan Bisht')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Rohan Bisht')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>CSE2022088</td>
+                <td><b>Sneha Gupta</b></td>
+                <td>CSE</td>
+                <td>4th</td>
+                <td>88%</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('student','Sneha Gupta')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Sneha Gupta')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>IT2021033</td>
+                <td><b>Karan Negi</b></td>
+                <td>IT</td>
+                <td>6th</td>
+                <td>94%</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('student','Karan Negi')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Karan Negi')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>CIVIL2023010</td>
+                <td><b>Ananya Verma</b></td>
+                <td>Civil</td>
+                <td>2nd</td>
+                <td>82%</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('student','Ananya Verma')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Ananya Verma')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>BT2022057</td>
+                <td><b>Vikram Joshi</b></td>
+                <td>BT</td>
+                <td>4th</td>
+                <td>71%</td>
+                <td><span class="tag inactive">Inactive</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('student','Vikram Joshi')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Vikram Joshi')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>ECE2023021</td>
+                <td><b>Divya Thapa</b></td>
+                <td>ECE</td>
+                <td>2nd</td>
+                <td>86%</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('student','Divya Thapa')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Divya Thapa')">Delete</button></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <button class="pag-btn active">1</button>
+            <button class="pag-btn">2</button>
+            <button class="pag-btn">3</button>
+            <button class="pag-btn">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ FACULTY ═══ -->
+      <div id="page-faculty" class="page">
+        <div class="section-header">
+          <h3>Faculty</h3>
+          <div class="search-wrap">
+            <input type="text" class="search-input" placeholder="🔍 Search faculty..."
+              oninput="filterTable('faculty-tbody',this.value)">
+            <button class="btn-primary" onclick="openAddModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Add Faculty
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Faculty ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Courses</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="faculty-tbody">
+              <tr>
+                <td>FAC001</td>
+                <td><b>Dr. Anand Mehta</b></td>
+                <td>CSE</td>
+                <td>Associate Professor</td>
+                <td>CS301, CS410</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('faculty','Dr. Anand Mehta')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Dr. Anand Mehta')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>FAC002</td>
+                <td><b>Prof. Sunita Rao</b></td>
+                <td>ECE</td>
+                <td>Professor</td>
+                <td>EC201, EC302</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('faculty','Prof. Sunita Rao')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Prof. Sunita Rao')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>FAC003</td>
+                <td><b>Dr. Rajesh Pant</b></td>
+                <td>ME</td>
+                <td>Assistant Professor</td>
+                <td>ME101, ME205</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('faculty','Dr. Rajesh Pant')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Dr. Rajesh Pant')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>FAC004</td>
+                <td><b>Ms. Pooja Arora</b></td>
+                <td>IT</td>
+                <td>Lecturer</td>
+                <td>IT301</td>
+                <td><span class="tag inactive">Inactive</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('faculty','Ms. Pooja Arora')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Ms. Pooja Arora')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>FAC005</td>
+                <td><b>Dr. Manoj Kumar</b></td>
+                <td>Civil</td>
+                <td>Professor</td>
+                <td>CE401, CE210</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('faculty','Dr. Manoj Kumar')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Dr. Manoj Kumar')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>FAC006</td>
+                <td><b>Dr. Neha Singh</b></td>
+                <td>BT</td>
+                <td>Associate Professor</td>
+                <td>BT101, BT302</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('faculty','Dr. Neha Singh')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Dr. Neha Singh')">Delete</button></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <button class="pag-btn active">1</button>
+            <button class="pag-btn">2</button>
+            <button class="pag-btn">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ COURSES ═══ -->
+      <div id="page-courses" class="page">
+        <div class="section-header">
+          <h3>Courses</h3>
+          <div class="search-wrap">
+            <input type="text" class="search-input" placeholder="🔍 Search courses..."
+              oninput="filterTable('courses-tbody',this.value)">
+            <button class="btn-primary" onclick="openAddModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Add Course
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Department</th>
+                <th>Credits</th>
+                <th>Faculty</th>
+                <th>Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="courses-tbody">
+              <tr>
+                <td>CS301</td>
+                <td><b>Data Structures & Algorithms</b></td>
+                <td>CSE</td>
+                <td>4</td>
+                <td>Dr. Anand Mehta</td>
+                <td><span class="tag blue">Core</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('course','CS301')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('CS301')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>CS410</td>
+                <td><b>Machine Learning</b></td>
+                <td>CSE</td>
+                <td>3</td>
+                <td>Dr. Anand Mehta</td>
+                <td><span class="tag orange">Elective</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('course','CS410')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('CS410')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>EC201</td>
+                <td><b>Analog Electronics</b></td>
+                <td>ECE</td>
+                <td>4</td>
+                <td>Prof. Sunita Rao</td>
+                <td><span class="tag blue">Core</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('course','EC201')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('EC201')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>ME101</td>
+                <td><b>Engineering Mechanics</b></td>
+                <td>ME</td>
+                <td>4</td>
+                <td>Dr. Rajesh Pant</td>
+                <td><span class="tag blue">Core</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('course','ME101')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('ME101')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>IT301</td>
+                <td><b>Web Technologies</b></td>
+                <td>IT</td>
+                <td>3</td>
+                <td>Ms. Pooja Arora</td>
+                <td><span class="tag blue">Core</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('course','IT301')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('IT301')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>CE401</td>
+                <td><b>Structural Analysis</b></td>
+                <td>Civil</td>
+                <td>4</td>
+                <td>Dr. Manoj Kumar</td>
+                <td><span class="tag blue">Core</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('course','CE401')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('CE401')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>BT101</td>
+                <td><b>Cell Biology</b></td>
+                <td>BT</td>
+                <td>3</td>
+                <td>Dr. Neha Singh</td>
+                <td><span class="tag blue">Core</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('course','BT101')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('BT101')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>CS499</td>
+                <td><b>Deep Learning</b></td>
+                <td>CSE</td>
+                <td>3</td>
+                <td>Dr. Anand Mehta</td>
+                <td><span class="tag orange">Elective</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('course','CS499')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('CS499')">Delete</button></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <button class="pag-btn active">1</button>
+            <button class="pag-btn">2</button>
+            <button class="pag-btn">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ MARKS ═══ -->
+      <div id="page-marks" class="page">
+        <div class="section-header">
+          <h3>Marks / Grades</h3>
+          <div class="search-wrap">
+            <input type="text" class="search-input" placeholder="🔍 Search records..."
+              oninput="filterTable('marks-tbody',this.value)">
+            <select class="select-sm">
+              <option>All Semesters</option>
+              <option>2nd</option>
+              <option>4th</option>
+              <option>6th</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Roll No.</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Internal</th>
+                <th>External</th>
+                <th>Total</th>
+                <th>Grade</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="marks-tbody">
+              <tr>
+                <td>CSE2021001</td>
+                <td><b>Aarav Sharma</b></td>
+                <td>CS301</td>
+                <td>38/40</td>
+                <td>56/60</td>
+                <td>94/100</td>
+                <td><span class="tag active">A+</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('marks','Aarav Sharma')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Record')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>ECE2021042</td>
+                <td><b>Priya Rawat</b></td>
+                <td>EC201</td>
+                <td>32/40</td>
+                <td>49/60</td>
+                <td>81/100</td>
+                <td><span class="tag blue">B+</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('marks','Priya Rawat')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Record')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>ME2022015</td>
+                <td><b>Rohan Bisht</b></td>
+                <td>ME101</td>
+                <td>25/40</td>
+                <td>38/60</td>
+                <td>63/100</td>
+                <td><span class="tag orange">C</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('marks','Rohan Bisht')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Record')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>CSE2022088</td>
+                <td><b>Sneha Gupta</b></td>
+                <td>CS301</td>
+                <td>36/40</td>
+                <td>54/60</td>
+                <td>90/100</td>
+                <td><span class="tag active">A</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('marks','Sneha Gupta')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Record')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>IT2021033</td>
+                <td><b>Karan Negi</b></td>
+                <td>IT301</td>
+                <td>40/40</td>
+                <td>58/60</td>
+                <td>98/100</td>
+                <td><span class="tag active">A+</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('marks','Karan Negi')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Record')">Delete</button></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ DEPARTMENTS ═══ -->
+      <div id="page-departments" class="page">
+        <div class="section-header">
+          <h3>Departments</h3>
+          <div class="search-wrap">
+            <input type="text" class="search-input" placeholder="🔍 Search departments..."
+              oninput="filterTable('dept-tbody',this.value)">
+            <button class="btn-primary" onclick="openAddModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Add Department
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Department Name</th>
+                <th>HOD</th>
+                <th>Students</th>
+                <th>Courses</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dept-tbody">
+              <tr>
+                <td>CSE</td>
+                <td><b>Computer Science & Engineering</b></td>
+                <td>Dr. Anand Mehta</td>
+                <td>380</td>
+                <td>24</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('department','CSE')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('CSE')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>ECE</td>
+                <td><b>Electronics & Communication Engg.</b></td>
+                <td>Prof. Sunita Rao</td>
+                <td>218</td>
+                <td>18</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('department','ECE')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('ECE')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>ME</td>
+                <td><b>Mechanical Engineering</b></td>
+                <td>Dr. Rajesh Pant</td>
+                <td>195</td>
+                <td>20</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('department','ME')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('ME')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>Civil</td>
+                <td><b>Civil Engineering</b></td>
+                <td>Dr. Manoj Kumar</td>
+                <td>175</td>
+                <td>16</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('department','Civil')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('Civil')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>IT</td>
+                <td><b>Information Technology</b></td>
+                <td>Ms. Pooja Arora</td>
+                <td>160</td>
+                <td>15</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('department','IT')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('IT')">Delete</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>BT</td>
+                <td><b>Biotechnology</b></td>
+                <td>Dr. Neha Singh</td>
+                <td>120</td>
+                <td>14</td>
+                <td><span class="tag active">Active</span></td>
+                <td>
+                  <div class="action-btns"><button class="btn-edit"
+                      onclick="openEditModal('department','BT')">Edit</button><button class="btn-del"
+                      onclick="openDeleteModal('BT')">Delete</button></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ SETTINGS ═══ -->
+      <div id="page-settings" class="page">
+        <div class="section-header">
+          <h3>Settings</h3>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="chart-card">
+            <div class="chart-title" style="margin-bottom:18px;">Profile Settings</div>
+            <div class="form-group"><label>Full Name</label><input type="text" value="Admin User"></div>
+            <div class="form-group"><label>Email Address</label><input type="email" value="admin@srms.edu.in"></div>
+            <div class="form-group"><label>Phone</label><input type="text" value="+91 98765 43210"></div>
+            <div class="form-group"><label>Role</label><input type="text" value="Super Administrator" disabled
+                style="background:#f1f5f9;color:#64748b"></div>
+            <button class="btn-primary" style="margin-top:4px;"
+              onclick="showToast('Profile updated successfully!')">Save Changes</button>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title" style="margin-bottom:18px;">Change Password</div>
+            <div class="form-group"><label>Current Password</label><input type="password" placeholder="••••••••"></div>
+            <div class="form-group"><label>New Password</label><input type="password" placeholder="••••••••"></div>
+            <div class="form-group"><label>Confirm New Password</label><input type="password" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" style="margin-top:4px;"
+              onclick="showToast('Password updated successfully!')">Update Password</button>
+          </div>
+          <div class="chart-card" style="grid-column:span 2">
+            <div class="chart-title" style="margin-bottom:18px;">System Preferences</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+              <div class="form-group"><label>Academic Year</label><select class="select-sm" style="width:100%">
+                  <option>2024–25</option>
+                  <option>2023–24</option>
+                </select></div>
+              <div class="form-group"><label>Default Semester</label><select class="select-sm" style="width:100%">
+                  <option>6th</option>
+                  <option>4th</option>
+                  <option>2nd</option>
+                </select></div>
+              <div class="form-group"><label>Timezone</label><select class="select-sm" style="width:100%">
+                  <option>IST (UTC+5:30)</option>
+                  <option>UTC</option>
+                </select></div>
+            </div>
+            <button class="btn-primary" style="margin-top:4px;" onclick="showToast('Preferences saved!')">Save
+              Preferences</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+
+  <!-- ─── Add/Edit Modal ─── -->
+  <div class="overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Student</h3>
+        <button class="modal-close" onclick="closeAllModals()">✕</button>
+      </div>
+      <div id="modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+        <button class="btn-save" onclick="handleSave()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Delete Confirm Modal ─── -->
+  <div class="overlay" id="delete-overlay" onclick="closeModal(event)">
+    <div class="modal confirm-modal">
+      <div class="confirm-icon">⚠️</div>
+      <h3>Confirm Delete</h3>
+      <p id="delete-msg">Are you sure you want to delete <b>Aarav Sharma</b>? This action cannot be undone.</p>
+      <div style="display:flex;justify-content:center;gap:10px;">
+        <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+        <button class="btn-del-confirm" onclick="handleDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Toast ─── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="JS/admin.js"></script>
+</body>
+
+</html>
