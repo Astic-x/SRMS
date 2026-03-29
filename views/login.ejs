@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SRMS - Login</title>
+    <link rel="stylesheet" href="CSS/login.css" />
+</head>
+
+<body>
+
+    <div class="card">
+        <div class="logo-area">
+            <h1>SRMS</h1>
+            <p>Student Record Management System</p>
+        </div>
+
+        <div class="role-tabs">
+            <button class="role-tab active" data-role="admin" onclick="switchRole(this)">Admin</button>
+            <button class="role-tab" data-role="faculty" onclick="switchRole(this)">Faculty</button>
+            <button class="role-tab" data-role="student" onclick="switchRole(this)">Student</button>
+        </div>
+
+        <form id="loginForm" novalidate>
+            <div class="form-group">
+                <label for="username" id="usernameLabel">Username / Employee ID</label>
+                <input type="text" id="username" placeholder="Enter your ID" autocomplete="username" />
+                <div class="err-msg" id="usernameErr">Please enter a valid username or ID.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="pw-wrap">
+                    <input type="password" id="password" placeholder="Enter your password"
+                        autocomplete="current-password" />
+                    <button type="button" class="toggle-pw" onclick="togglePw()" id="toggleBtn">Show</button>
+                </div>
+                <div class="err-msg" id="passwordErr">Password must be at least 6 characters.</div>
+            </div>
+
+            <div class="row-meta">
+                <label class="remember">
+                    <input type="checkbox" id="rememberMe" />
+                    Remember me
+                </label>
+                <a href="#" class="forgot" onclick="openForgot(event)">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">Login</button>
+
+            <div class="success-msg" id="successMsg">
+                Login successful. Redirecting to dashboard...
+            </div>
+        </form>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="overlay" id="forgotOverlay">
+        <div class="modal">
+            <div id="forgotFormWrap">
+                <h3>Forgot Password</h3>
+                <p>Enter your registered email and we'll send a reset link.</p>
+                <div class="form-group">
+                    <label for="resetEmail">Email Address</label>
+                    <input type="email" id="resetEmail" placeholder="your@email.com" />
+                    <div class="err-msg" id="resetErr">Please enter a valid email address.</div>
+                </div>
+                <div class="modal-btns">
+                    <button class="btn-cancel" onclick="closeForgot()">Cancel</button>
+                    <button class="btn-send" onclick="sendReset()">Send Link</button>
+                </div>
+            </div>
+
+            <div class="sent-msg" id="sentWrap">
+                <div class="tick">&#10003;</div>
+                <p>Reset link sent to<br /><strong id="sentEmail"></strong></p>
+                <div class="modal-btns" style="margin-top:16px">
+                    <button class="btn-send" onclick="closeForgot()" style="flex:1">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="JS/login.js"></script>
+</body>
+
+</html
