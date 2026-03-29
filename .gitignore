@@ -16,3 +16,5 @@ Thumbs.db
 # IDE settings
 .vscode/
 .idea/
+
+fix-passwords.js
