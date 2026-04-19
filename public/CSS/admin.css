@@ -143,15 +143,39 @@
   .tag.blue { background: var(--blue-light); color: var(--blue); }
   .tag.orange { background: var(--orange-bg); color: var(--orange); }
 
-  .action-btns { display: flex; gap: 6px; }
+  .action-btns { display: flex !important; gap: 8px !important; align-items: center !important; }
   .btn-edit, .btn-del {
-    padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
-    cursor: pointer; border: none; transition: all .15s; font-family: 'DM Sans', sans-serif;
+    padding: 8px 18px !important; 
+    border-radius: 10px !important; 
+    font-size: 13px !important; 
+    font-weight: 600 !important;
+    cursor: pointer !important; 
+    border: none !important; 
+    transition: all 0.3s ease !important; 
+    font-family: 'DM Sans', sans-serif !important;
+    color: white !important;
   }
-  .btn-edit { background: var(--blue-light); color: var(--blue); }
-  .btn-edit:hover { background: #bfdbfe; }
-  .btn-del { background: var(--red-bg); color: var(--red); }
-  .btn-del:hover { background: #fecaca; }
+  .btn-edit { 
+    background: #2563eb !important; 
+    color: white !important; 
+  }
+  .btn-edit:hover { 
+    background: #1e40af !important; 
+    box-shadow: 0 6px 16px rgba(30, 64, 175, 0.35) !important;
+    transform: translateY(-2px) !important;
+  }
+  .btn-del { 
+    background: #ef4444 !important; 
+    color: white !important; 
+  }
+  .btn-del:hover { 
+    background: #dc2626 !important; 
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35) !important;
+    transform: translateY(-2px) !important;
+  }
+  .btn-edit:active, .btn-del:active {
+    transform: translateY(0) !important;
+  }
 
   /* ── Modal ── */
   .overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); backdrop-filter: blur(2px); z-index: 200; display: none; place-items: center; }
