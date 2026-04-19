@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRMS — Faculty Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #2563EB;
+    --primary-light: #EFF6FF;
+    --primary-dark: #1D4ED8;
+    --green: #16A34A;
+    --green-light: #DCFCE7;
+    --red: #DC2626;
+    --red-light: #FEE2E2;
+    --amber: #D97706;
+    --amber-light: #FEF3C7;
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --bg: #F1F5F9;
+    --card-bg: #ffffff;
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --text-light: #94A3B8;
+    --border: #E2E8F0;
+    --sidebar-width: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-width); background: #fff;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    height: 100vh; position: fixed; left: 0; top: 0; z-index: 100;
+  }
+  .sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid var(--border); }
+  .logo-title { font-size: 22px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
+  .logo-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+  .nav-section-label { font-size: 10px; font-weight: 600; color: var(--text-light); letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 8px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+  .nav-item:hover { background: var(--bg); color: var(--text); }
+  .nav-item.active { background: var(--primary-light); color: var(--primary); }
+  .sidebar-user { padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: #7C3AED; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .user-name { font-size: 13px; font-weight: 600; }
+  .user-role { font-size: 11px; color: var(--text-muted); }
+
+  /* ── MAIN ── */
+  .main { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar { height: 64px; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-size: 18px; font-weight: 700; }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+  .btn-notif { width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+  .notif-dot { width: 8px; height: 8px; background: var(--red); border-radius: 50%; position: absolute; top: 7px; right: 7px; border: 1.5px solid #fff; }
+  .btn-primary { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { border: 1px solid var(--border); background: #fff; color: var(--text-muted); border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px; }
+
+  /* ── PAGES ── */
+  .page { padding: 28px; display: none; }
+  .page.active { display: block; }
+
+  /* ── CARDS ── */
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .card-title { font-size: 15px; font-weight: 600; }
+  .select-sm { border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; font-size: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; background: #fff; cursor: pointer; }
+
+  /* ── STATS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; display: flex; align-items: flex-start; gap: 16px; }
+  .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-icon.blue { background: var(--primary-light); }
+  .stat-icon.green { background: var(--green-light); }
+  .stat-icon.amber { background: var(--amber-light); }
+  .stat-icon.purple { background: var(--purple-light); }
+  .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+  .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+  .stat-change { font-size: 12px; margin-top: 3px; display: flex; align-items: center; gap: 3px; font-weight: 500; }
+  .stat-change.up { color: var(--green); }
+  .stat-change.down { color: var(--red); }
+  .stat-change.neutral { color: var(--text-muted); }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; padding: 0 12px 12px; border-bottom: 1px solid var(--border); }
+  tbody tr { transition: background 0.1s; }
+  tbody tr:hover { background: var(--bg); }
+  tbody td { padding: 11px 12px; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child td { border-bottom: none; }
+  .badge { padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .badge.active  { background: var(--green-light);  color: var(--green); }
+  .badge.low     { background: var(--red-light);    color: var(--red); }
+  .badge.pending { background: var(--amber-light);  color: var(--amber); }
+  .badge.done    { background: var(--primary-light); color: var(--primary); }
+  .badge.present { background: var(--green-light);  color: var(--green); }
+  .badge.absent  { background: var(--red-light);    color: var(--red); }
+  .badge.late    { background: var(--amber-light);  color: var(--amber); }
+
+  /* ── COURSE CARDS ── */
+  .course-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .course-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; cursor: pointer; transition: box-shadow 0.15s; }
+  .course-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .course-card.selected { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  .course-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .course-code { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text-muted); margin-bottom: 3px; }
+  .course-name { font-size: 14px; font-weight: 600; }
+  .course-meta { display: flex; gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .course-meta-item { text-align: center; }
+  .course-meta-val { font-size: 16px; font-weight: 700; }
+  .course-meta-lbl { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+
+  /* ── ATTENDANCE GRID ── */
+  .attendance-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .att-date { border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: #fff; }
+  .att-summary { display: flex; gap: 12px; margin-left: auto; }
+  .att-pill { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+  .att-pill.p { background: var(--green-light); color: var(--green); }
+  .att-pill.a { background: var(--red-light); color: var(--red); }
+  .att-pill.l { background: var(--amber-light); color: var(--amber); }
+  .att-actions { display: flex; gap: 10px; }
+  .att-toggle { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .att-toggle-btn { padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: #fff; font-family: 'DM Sans', sans-serif; color: var(--text-muted); transition: all 0.15s; }
+  .att-toggle-btn.sel { background: var(--primary); color: #fff; }
+
+  /* ── MARKS ENTRY ── */
+  .marks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+  .marks-course-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .marks-course-btn { padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--text-muted); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .marks-course-btn.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+  input[type=number] { width: 64px; border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; font-size: 13px; font-family: 'DM Sans', monospace; text-align: center; background: #fff; }
+  input[type=number]:focus { outline: none; border-color: var(--primary); }
+
+  /* ── RESOURCES ── */
+  .resource-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .resource-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .resource-icon { width: 40px; height: 40px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .resource-title { font-size: 14px; font-weight: 600; }
+  .resource-meta { font-size: 12px; color: var(--text-muted); }
+  .resource-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+  .upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: border-color 0.15s; }
+  .upload-zone:hover { border-color: var(--primary); }
+  .upload-zone-icon { font-size: 32px; margin-bottom: 10px; }
+  .upload-zone-text { font-size: 14px; color: var(--text-muted); }
+  .upload-zone-sub { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+
+  /* ── PROFILE ── */
+  .profile-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+  .profile-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 28px; text-align: center; }
+  .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #7C3AED; color: #fff; font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+  .profile-name { font-size: 18px; font-weight: 700; }
+  .profile-dept { font-size: 13px; color: var(--text-muted); margin: 3px 0 14px; }
+  .profile-stats { display: flex; justify-content: center; gap: 24px; padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 14px 0; }
+  .ps-val { font-size: 20px; font-weight: 700; }
+  .ps-lbl { font-size: 11px; color: var(--text-muted); }
+  .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .form-group.half { display: inline-flex; width: calc(50% - 7px); }
+  label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  input[type=text], input[type=email], input[type=tel], select { border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: #fff; color: var(--text); width: 100%; }
+  input:focus, select:focus { outline: none; border-color: var(--primary); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .section-divider { font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 12px; }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 14px; padding: 28px; width: 480px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+  .modal-title { font-size: 17px; font-weight: 700; }
+  .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); line-height: 1; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+
+  /* ── TIMETABLE ── */
+  .timetable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .timetable th { padding: 10px 14px; background: var(--bg); font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--border); }
+  .timetable td { padding: 10px 14px; border: 1px solid var(--border); vertical-align: top; min-height: 56px; }
+  .tt-class { background: var(--primary-light); border-left: 3px solid var(--primary); border-radius: 4px; padding: 5px 8px; margin-bottom: 4px; }
+  .tt-class.purple { background: var(--purple-light); border-left-color: var(--purple); }
+  .tt-class.green { background: var(--green-light); border-left-color: var(--green); }
+  .tt-name { font-size: 12px; font-weight: 600; }
+  .tt-room { font-size: 11px; color: var(--text-muted); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-title">SRMS</div>
+    <div class="logo-sub">Student Record Management System</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <div class="nav-item active" onclick="navigate('dashboard',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="navigate('courses',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      My Courses
+    </div>
+    <div class="nav-item" onclick="navigate('attendance',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Attendance
+    </div>
+    <div class="nav-item" onclick="navigate('marks',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Marks Entry
+    </div>
+    <div class="nav-item" onclick="navigate('students',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      My Students
+    </div>
+    <div class="nav-section-label">Tools</div>
+    <div class="nav-item" onclick="navigate('resources',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Resources
+    </div>
+    <div class="nav-item" onclick="navigate('timetable',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Timetable
+    </div>
+    <div class="nav-item" onclick="navigate('profile',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      My Profile
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">AV</div>
+    <div>
+      <div class="user-name">Dr. Anjali Verma</div>
+      <div class="user-role">Faculty — CSE</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <header class="topbar">
+    <span class="topbar-title" id="page-title">Dashboard</span>
+    <div class="topbar-actions">
+      <div class="btn-notif">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+      <button class="btn-outline" onclick="document.getElementById('uploadModal').classList.add('open')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Upload Resource
+      </button>
+      <button class="btn-primary" onclick="navigate('attendance', document.querySelector('.nav-item:nth-child(4)'))">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Mark Attendance
+      </button>
+    </div>
+  </header>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <svg width="20" height="20" fill="none" stroke="#2563EB" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Assigned Courses</div>
+          <div class="stat-value">4</div>
+          <div class="stat-change neutral">Even Semester</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <svg width="20" height="20" fill="none" stroke="#16A34A" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Total Students</div>
+          <div class="stat-value">320</div>
+          <div class="stat-change up">↑ 18 this semester</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">
+          <svg width="20" height="20" fill="none" stroke="#D97706" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Avg. Class Attendance</div>
+          <div class="stat-value">82%</div>
+          <div class="stat-change down">↓ 3% vs last week</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">
+          <svg width="20" height="20" fill="none" stroke="#7C3AED" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Marks Submitted</div>
+          <div class="stat-value">2/4</div>
+          <div class="stat-change pending" style="color:var(--amber)">2 pending</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px">
+      <!-- Today's Classes -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Today's Schedule</span>
+          <span style="font-size:12px;color:var(--text-muted);background:var(--bg);padding:4px 10px;border-radius:20px;font-weight:500">Monday, Mar 30</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:14px;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--primary-light)">
+            <div style="text-align:center;min-width:56px">
+              <div style="font-size:13px;font-weight:700;color:var(--primary)">9:00</div>
+              <div style="font-size:10px;color:var(--text-muted)">1 hr</div>
+            </div>
+            <div style="width:3px;height:40px;background:var(--primary);border-radius:2px"></div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600">Data Structures (CSE301)</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Room 204 · 78 students</div>
+            </div>
+            <span class="badge done">Upcoming</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:12px;border-radius:10px;border:1px solid var(--border)">
+            <div style="text-align:center;min-width:56px">
+              <div style="font-size:13px;font-weight:700">11:00</div>
+              <div style="font-size:10px;color:var(--text-muted)">1 hr</div>
+            </div>
+            <div style="width:3px;height:40px;background:#CBD5E1;border-radius:2px"></div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600">DBMS Lab (CSE305)</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Lab 3 · 40 students</div>
+            </div>
+            <span class="badge pending">Pending</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:12px;border-radius:10px;border:1px solid var(--border)">
+            <div style="text-align:center;min-width:56px">
+              <div style="font-size:13px;font-weight:700">2:00</div>
+              <div style="font-size:10px;color:var(--text-muted)">1 hr</div>
+            </div>
+            <div style="width:3px;height:40px;background:#CBD5E1;border-radius:2px"></div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600">Algorithms (CSE401)</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Room 301 · 65 students</div>
+            </div>
+            <span class="badge pending">Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Tasks -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Pending Tasks</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="padding:12px;border-radius:10px;background:var(--amber-light);border:1px solid #FDE68A">
+            <div style="font-size:13px;font-weight:600;color:var(--amber)">Marks Submission</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:3px">CSE301 internal marks due</div>
+            <div style="font-size:11px;color:var(--amber);margin-top:5px;font-weight:600">Due: Apr 2, 2025</div>
+          </div>
+          <div style="padding:12px;border-radius:10px;background:var(--red-light);border:1px solid #FECACA">
+            <div style="font-size:13px;font-weight:600;color:var(--red)">Attendance Pending</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:3px">DBMS Lab – Mar 28 not marked</div>
+            <div style="font-size:11px;color:var(--red);margin-top:5px;font-weight:600">Overdue</div>
+          </div>
+          <div style="padding:12px;border-radius:10px;background:var(--primary-light);border:1px solid #BFDBFE">
+            <div style="font-size:13px;font-weight:600;color:var(--primary)">Resource Upload</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Upload Algo lecture notes</div>
+            <div style="font-size:11px;color:var(--primary);margin-top:5px;font-weight:600">This week</div>
+          </div>
+          <div style="padding:12px;border-radius:10px;background:var(--green-light);border:1px solid #BBF7D0">
+            <div style="font-size:13px;font-weight:600;color:var(--green)">Marks Submitted ✓</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:3px">CSE205 practical marks done</div>
+            <div style="font-size:11px;color:var(--green);margin-top:5px;font-weight:600">Completed Mar 28</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Low Attendance Alert -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">⚠️ Low Attendance Students</span>
+        <span style="font-size:12px;color:var(--red);font-weight:600">Below 75%</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Roll No.</th><th>Course</th><th>Attendance</th><th>Classes Attended</th><th>Action</th></tr></thead>
+          <tbody id="lowAttTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MY COURSES ══ -->
+  <div class="page" id="page-courses">
+    <div class="course-grid" id="courseGrid"></div>
+  </div>
+
+  <!-- ══ ATTENDANCE ══ -->
+  <div class="page" id="page-attendance">
+    <div class="attendance-toolbar">
+      <select class="select-sm" style="font-size:13px;padding:7px 12px" onchange="renderAttTable(this.value)">
+        <option value="CSE301">CSE301 – Data Structures</option>
+        <option value="CSE305">CSE305 – DBMS Lab</option>
+        <option value="CSE401">CSE401 – Algorithms</option>
+        <option value="CSE205">CSE205 – OOP</option>
+      </select>
+      <input class="att-date" type="date" value="2025-03-30">
+      <div class="att-toggle">
+        <button class="att-toggle-btn sel" onclick="selectAllAtt('present',this)">All Present</button>
+        <button class="att-toggle-btn" onclick="selectAllAtt('absent',this)">All Absent</button>
+      </div>
+      <div class="att-summary">
+        <span class="att-pill p" id="pCount">P: 0</span>
+        <span class="att-pill a" id="aCount">A: 0</span>
+        <span class="att-pill l" id="lCount">L: 0</span>
+      </div>
+      <button class="btn-primary" style="margin-left:8px" onclick="saveAttendance()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Save
+      </button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Roll No.</th><th>Student Name</th><th>Status</th><th>Remarks</th></tr></thead>
+          <tbody id="attTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MARKS ENTRY ══ -->
+  <div class="page" id="page-marks">
+    <div class="marks-course-selector" id="marksCourseSelector"></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" id="marksCardTitle">Data Structures (CSE301) — Internal Marks</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-outline">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+          <button class="btn-primary" onclick="saveMarks()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Submit Marks
+          </button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Roll No.</th><th>Student Name</th><th>Internal (/25)</th><th>Practical (/20)</th><th>Assignment (/5)</th><th>Total (/50)</th></tr></thead>
+          <tbody id="marksTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MY STUDENTS ══ -->
+  <div class="page" id="page-students">
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <input style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;font-family:'DM Sans',sans-serif;width:280px;background:#fff" placeholder="🔍  Search students…" oninput="filterMyStudents(this.value)">
+      <select class="select-sm" style="font-size:13px;padding:7px 12px">
+        <option>All Courses</option>
+        <option>CSE301</option><option>CSE305</option><option>CSE401</option><option>CSE205</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Roll No.</th><th>Semester</th><th>Course</th><th>Attendance</th><th>Internal Marks</th><th>Status</th></tr></thead>
+          <tbody id="myStudentsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RESOURCES ══ -->
+  <div class="page" id="page-resources">
+    <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center">
+      <select class="select-sm" style="font-size:13px;padding:7px 12px">
+        <option>All Courses</option><option>CSE301</option><option>CSE305</option><option>CSE401</option><option>CSE205</option>
+      </select>
+      <select class="select-sm" style="font-size:13px;padding:7px 12px">
+        <option>All Types</option><option>Notes</option><option>Assignment</option><option>Lab Sheet</option><option>Syllabus</option>
+      </select>
+      <button class="btn-primary" style="margin-left:auto" onclick="document.getElementById('uploadModal').classList.add('open')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Upload Resource
+      </button>
+    </div>
+    <!-- Upload Zone -->
+    <div class="upload-zone" style="margin-bottom:20px" onclick="document.getElementById('uploadModal').classList.add('open')">
+      <div class="upload-zone-icon">📁</div>
+      <div class="upload-zone-text">Drag & drop files here, or click to browse</div>
+      <div class="upload-zone-sub">PDF, DOCX, PPTX, ZIP — max 50 MB</div>
+    </div>
+    <div class="resource-grid" id="resourceGrid"></div>
+  </div>
+
+  <!-- ══ TIMETABLE ══ -->
+  <div class="page" id="page-timetable">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Weekly Timetable</span>
+        <select class="select-sm"><option>Even Semester 2024–25</option></select>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="timetable">
+          <thead>
+            <tr>
+              <th style="width:90px">Time</th>
+              <th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-size:12px;font-weight:600;color:var(--text-muted)">9:00–10:00</td>
+              <td><div class="tt-class"><div class="tt-name">Data Structures</div><div class="tt-room">CSE301 · Rm 204</div></div></td>
+              <td></td>
+              <td><div class="tt-class"><div class="tt-name">Data Structures</div><div class="tt-room">CSE301 · Rm 204</div></div></td>
+              <td></td>
+              <td><div class="tt-class"><div class="tt-name">Data Structures</div><div class="tt-room">CSE301 · Rm 204</div></div></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;font-weight:600;color:var(--text-muted)">11:00–12:00</td>
+              <td><div class="tt-class purple"><div class="tt-name">DBMS Lab</div><div class="tt-room">CSE305 · Lab 3</div></div></td>
+              <td><div class="tt-class purple"><div class="tt-name">DBMS Lab</div><div class="tt-room">CSE305 · Lab 3</div></div></td>
+              <td></td>
+              <td><div class="tt-class purple"><div class="tt-name">DBMS Lab</div><div class="tt-room">CSE305 · Lab 3</div></div></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;font-weight:600;color:var(--text-muted)">12:00–1:00</td>
+              <td></td>
+              <td><div class="tt-class green"><div class="tt-name">OOP</div><div class="tt-room">CSE205 · Rm 101</div></div></td>
+              <td><div class="tt-class green"><div class="tt-name">OOP</div><div class="tt-room">CSE205 · Rm 101</div></div></td>
+              <td><div class="tt-class green"><div class="tt-name">OOP</div><div class="tt-room">CSE205 · Rm 101</div></div></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;font-weight:600;color:var(--text-muted)">2:00–3:00</td>
+              <td><div class="tt-class" style="background:var(--amber-light);border-left-color:var(--amber)"><div class="tt-name">Algorithms</div><div class="tt-room">CSE401 · Rm 301</div></div></td>
+              <td></td>
+              <td><div class="tt-class" style="background:var(--amber-light);border-left-color:var(--amber)"><div class="tt-name">Algorithms</div><div class="tt-room">CSE401 · Rm 301</div></div></td>
+              <td></td>
+              <td><div class="tt-class" style="background:var(--amber-light);border-left-color:var(--amber)"><div class="tt-name">Algorithms</div><div class="tt-room">CSE401 · Rm 301</div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROFILE ══ -->
+  <div class="page" id="page-profile">
+    <div class="profile-layout">
+      <div>
+        <div class="profile-card">
+          <div class="profile-avatar">AV</div>
+          <div class="profile-name">Dr. Anjali Verma</div>
+          <div class="profile-dept">Computer Science & Engineering</div>
+          <span class="badge active">Active</span>
+          <div class="profile-stats">
+            <div><div class="ps-val">4</div><div class="ps-lbl">Courses</div></div>
+            <div><div class="ps-val">320</div><div class="ps-lbl">Students</div></div>
+            <div><div class="ps-val">8</div><div class="ps-lbl">Yrs Exp</div></div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.6;text-align:left">
+            <div style="margin-bottom:6px"><b>Employee ID:</b> FAC-CSE-014</div>
+            <div style="margin-bottom:6px"><b>Email:</b> anjali.v@graphicera.edu.in</div>
+            <div style="margin-bottom:6px"><b>Phone:</b> +91 98765 43210</div>
+            <div><b>Joined:</b> July 2017</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:18px">Edit Profile</div>
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" value="Anjali"></div>
+          <div class="form-group"><label>Last Name</label><input type="text" value="Verma"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Email</label><input type="email" value="anjali.v@graphicera.edu.in"></div>
+          <div class="form-group"><label>Phone</label><input type="tel" value="+91 98765 43210"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Department</label><select><option>CSE</option><option>ECE</option><option>ME</option></select></div>
+          <div class="form-group"><label>Designation</label><input type="text" value="Associate Professor"></div>
+        </div>
+        <div class="form-group"><label>Specialization</label><input type="text" value="Data Structures, Algorithms, DBMS"></div>
+        <div class="section-divider">Change Password</div>
+        <div class="form-row">
+          <div class="form-group"><label>Current Password</label><input type="text" placeholder="••••••••"></div>
+          <div class="form-group"><label>New Password</label><input type="text" placeholder="••••••••"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px">
+          <button class="btn-primary">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ── UPLOAD MODAL ── -->
+<div class="modal-overlay" id="uploadModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Upload Resource</span>
+      <button class="modal-close" onclick="document.getElementById('uploadModal').classList.remove('open')">×</button>
+    </div>
+    <div class="form-group"><label>Course</label>
+      <select><option>CSE301 – Data Structures</option><option>CSE305 – DBMS Lab</option><option>CSE401 – Algorithms</option><option>CSE205 – OOP</option></select>
+    </div>
+    <div class="form-group"><label>Resource Type</label>
+      <select><option>Lecture Notes</option><option>Assignment</option><option>Lab Sheet</option><option>Previous Year Paper</option><option>Syllabus</option></select>
+    </div>
+    <div class="form-group"><label>Title</label><input type="text" placeholder="e.g. Unit 3 – Trees and Graphs"></div>
+    <div style="border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;margin:14px 0">
+      <div style="font-size:24px;margin-bottom:6px">📄</div>
+      <div style="font-size:13px;color:var(--text-muted)">Click to select a file</div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:3px">PDF, DOCX, PPTX — max 50 MB</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="document.getElementById('uploadModal').classList.remove('open')">Cancel</button>
+      <button class="btn-primary">Upload</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SAVE TOAST ── -->
+<div id="toast" style="display:none;position:fixed;bottom:28px;right:28px;background:#0F172A;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.2)"></div>
+
+<script>
+// ── DATA ──
+const courses = [
+  { code:'CSE301', name:'Data Structures',  sem:'3rd', students:78, color:'#EFF6FF', accent:'#2563EB', submitted:false },
+  { code:'CSE305', name:'DBMS Lab',          sem:'3rd', students:40, color:'#EDE9FE', accent:'#7C3AED', submitted:true  },
+  { code:'CSE401', name:'Algorithms',        sem:'5th', students:65, color:'#FEF3C7', accent:'#D97706', submitted:false },
+  { code:'CSE205', name:'OOP with Java',     sem:'3rd', students:137,color:'#DCFCE7', accent:'#16A34A', submitted:true  },
+];
+
+const attendanceStudents = {
+  CSE301: [
+    { roll:'CSE2101', name:'Aarav Mehta' },  { roll:'CSE2102', name:'Priya Sharma' },
+    { roll:'CSE2103', name:'Karan Singh' },   { roll:'CSE2104', name:'Sneha Gupta' },
+    { roll:'CSE2105', name:'Rohan Joshi' },   { roll:'CSE2106', name:'Anjali Patel' },
+    { roll:'CSE2107', name:'Dev Kumar' },     { roll:'CSE2108', name:'Nidhi Kapoor' },
+  ],
+  CSE305: [
+    { roll:'CSE2101', name:'Aarav Mehta' },  { roll:'CSE2102', name:'Priya Sharma' },
+    { roll:'CSE2109', name:'Vikram Nair' },   { roll:'CSE2110', name:'Pooja Rao' },
+  ],
+  CSE401: [
+    { roll:'CSE2201', name:'Rahul Verma' },  { roll:'CSE2202', name:'Simran Kaur' },
+    { roll:'CSE2203', name:'Amit Shah' },     { roll:'CSE2204', name:'Devika Nair' },
+    { roll:'CSE2205', name:'Tarun Bose' },
+  ],
+  CSE205: [
+    { roll:'CSE2101', name:'Aarav Mehta' },  { roll:'CSE2102', name:'Priya Sharma' },
+    { roll:'CSE2301', name:'Meera Das' },     { roll:'CSE2302', name:'Nikhil Sen' },
+    { roll:'CSE2303', name:'Lara Fernandez'}, { roll:'CSE2304', name:'Aryan Gupta' },
+  ],
+};
+
+const attState = {};
+const marksState = {};
+
+const myStudents = [
+  { name:'Aarav Mehta',   roll:'CSE2101', sem:'3rd', course:'CSE301', att:61, internal:14 },
+  { name:'Priya Sharma',  roll:'CSE2102', sem:'3rd', course:'CSE301', att:91, internal:23 },
+  { name:'Karan Singh',   roll:'CSE2103', sem:'3rd', course:'CSE301', att:88, internal:21 },
+  { name:'Sneha Gupta',   roll:'CSE2104', sem:'3rd', course:'CSE301', att:95, internal:24 },
+  { name:'Rohan Joshi',   roll:'CSE2105', sem:'3rd', course:'CSE301', att:83, internal:20 },
+  { name:'Anjali Patel',  roll:'CSE2106', sem:'3rd', course:'CSE301', att:72, internal:18 },
+  { name:'Rahul Verma',   roll:'CSE2201', sem:'5th', course:'CSE401', att:84, internal:19 },
+  { name:'Devika Nair',   roll:'CSE2204', sem:'5th', course:'CSE401', att:78, internal:17 },
+  { name:'Simran Kaur',   roll:'CSE2202', sem:'5th', course:'CSE401', att:90, internal:22 },
+];
+
+const resources = [
+  { title:'Unit 1 – Arrays & Linked Lists', course:'CSE301', type:'Notes',      icon:'📄', bg:'#EFF6FF', date:'Mar 20' },
+  { title:'Unit 2 – Trees & Graphs',         course:'CSE301', type:'Notes',      icon:'📄', bg:'#EFF6FF', date:'Mar 25' },
+  { title:'Lab Sheet 3 – SQL Joins',          course:'CSE305', type:'Lab Sheet', icon:'🧪', bg:'#EDE9FE', date:'Mar 18' },
+  { title:'Assignment 1 – Sorting',           course:'CSE401', type:'Assignment',icon:'📝', bg:'#FEF3C7', date:'Mar 22' },
+  { title:'Syllabus 2024–25',                 course:'CSE301', type:'Syllabus',  icon:'📋', bg:'#DCFCE7', date:'Jan 10' },
+  { title:'Previous Year Paper 2023',         course:'CSE401', type:'Paper',     icon:'📜', bg:'#FEF3C7', date:'Feb 5' },
+];
+
+// ── LOW ATTENDANCE TABLE ──
+const lowAtt = myStudents.filter(s => s.att < 75);
+document.getElementById('lowAttTbody').innerHTML = lowAtt.map(s => `
+  <tr>
+    <td><strong>${s.name}</strong></td>
+    <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted)">${s.roll}</td>
+    <td>${s.course}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+          <div style="width:${s.att}%;height:100%;background:var(--red);border-radius:3px"></div>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:var(--red);min-width:32px">${s.att}%</span>
+      </div>
+    </td>
+    <td style="color:var(--text-muted);font-size:12px">${Math.round(s.att*20/100)} / 20</td>
+    <td><button class="badge pending" style="cursor:pointer;border:none">Notify</button></td>
+  </tr>
+`).join('');
+
+// ── COURSE CARDS ──
+const cgEl = document.getElementById('courseGrid');
+courses.forEach(c => {
+  cgEl.innerHTML += `
+    <div class="course-card" onclick="selectCourse('${c.code}')">
+      <div class="course-top">
+        <div>
+          <div class="course-code">${c.code}</div>
+          <div class="course-name">${c.name}</div>
+        </div>
+        <span class="badge ${c.submitted ? 'active' : 'pending'}">${c.submitted ? 'Marks Done' : 'Pending'}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted)">Semester: ${c.sem}</div>
+      <div class="course-meta">
+        <div class="course-meta-item"><div class="course-meta-val" style="color:${c.accent}">${c.students}</div><div class="course-meta-lbl">Students</div></div>
+        <div class="course-meta-item"><div class="course-meta-val" style="color:${c.accent}">82%</div><div class="course-meta-lbl">Avg Att.</div></div>
+        <div class="course-meta-item"><div class="course-meta-val" style="color:${c.accent}">24</div><div class="course-meta-lbl">Classes</div></div>
+      </div>
+    </div>
+  `;
+});
+function selectCourse(code) {
+  document.querySelectorAll('.course-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+// ── ATTENDANCE TABLE ──
+function renderAttTable(course) {
+  const list = attendanceStudents[course] || [];
+  const tbody = document.getElementById('attTbody');
+  tbody.innerHTML = list.map(s => {
+    const key = course + '_' + s.roll;
+    const cur = attState[key] || 'present';
+    return `
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted)">${s.roll}</td>
+        <td><strong>${s.name}</strong></td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button onclick="setAtt('${key}','present',this)" class="att-pill p ${cur==='present'?'':'opacity-low'}" style="cursor:pointer;border:none;opacity:${cur==='present'?1:0.4}">P</button>
+            <button onclick="setAtt('${key}','absent',this)"  class="att-pill a ${cur==='absent'?'':'opacity-low'}"  style="cursor:pointer;border:none;opacity:${cur==='absent'?1:0.4}">A</button>
+            <button onclick="setAtt('${key}','late',this)"    class="att-pill l ${cur==='late'?'':'opacity-low'}"    style="cursor:pointer;border:none;opacity:${cur==='late'?1:0.4}">L</button>
+          </div>
+        </td>
+        <td><input type="text" placeholder="Optional remark" style="border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;font-family:'DM Sans',sans-serif;width:180px;background:#fff"></td>
+      </tr>
+    `;
+  });
+  updateAttCounts();
+}
+function setAtt(key, val, btn) {
+  attState[key] = val;
+  const row = btn.closest('tr');
+  row.querySelectorAll('.att-pill').forEach(b => b.style.opacity = '0.4');
+  btn.style.opacity = '1';
+  updateAttCounts();
+}
+function updateAttCounts() {
+  const vals = Object.values(attState);
+  document.getElementById('pCount').textContent = 'P: ' + vals.filter(v=>v==='present').length;
+  document.getElementById('aCount').textContent = 'A: ' + vals.filter(v=>v==='absent').length;
+  document.getElementById('lCount').textContent = 'L: ' + vals.filter(v=>v==='late').length;
+}
+function selectAllAtt(val, el) {
+  document.querySelectorAll('.att-toggle-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  const course = document.querySelector('#page-attendance select').value;
+  const list = attendanceStudents[course] || [];
+  list.forEach(s => { attState[course+'_'+s.roll] = val; });
+  renderAttTable(course);
+}
+function saveAttendance() { showToast('✅ Attendance saved successfully!'); }
+renderAttTable('CSE301');
+
+// ── MARKS ENTRY ──
+const mcSel = document.getElementById('marksCourseSelector');
+courses.forEach((c, i) => {
+  mcSel.innerHTML += `<button class="marks-course-btn ${i===0?'active':''}" onclick="selectMarksCourse('${c.code}','${c.name}',this)">${c.code} – ${c.name}</button>`;
+});
+function renderMarksTable(course) {
+  const list = attendanceStudents[course] || [];
+  document.getElementById('marksTbody').innerHTML = list.map(s => {
+    const k = course+'_'+s.roll;
+    const m = marksState[k] || { int:0, prac:0, asgn:0 };
+    return `
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted)">${s.roll}</td>
+        <td><strong>${s.name}</strong></td>
+        <td><input type="number" min="0" max="25" value="${m.int}" onchange="updateMark('${k}','int',this.value)" placeholder="0"></td>
+        <td><input type="number" min="0" max="20" value="${m.prac}" onchange="updateMark('${k}','prac',this.value)" placeholder="0"></td>
+        <td><input type="number" min="0" max="5" value="${m.asgn}" onchange="updateMark('${k}','asgn',this.value)" placeholder="0"></td>
+        <td id="tot_${k}"><strong>${m.int+m.prac+m.asgn}</strong></td>
+      </tr>
+    `;
+  });
+}
+function updateMark(key, field, val) {
+  if (!marksState[key]) marksState[key] = {int:0,prac:0,asgn:0};
+  marksState[key][field] = parseInt(val)||0;
+  const t = marksState[key];
+  document.getElementById('tot_'+key).innerHTML = '<strong>'+(t.int+t.prac+t.asgn)+'</strong>';
+}
+function selectMarksCourse(code, name, el) {
+  document.querySelectorAll('.marks-course-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('marksCardTitle').textContent = name+' ('+code+') — Internal Marks';
+  renderMarksTable(code);
+}
+function saveMarks() { showToast('✅ Marks submitted successfully!'); }
+renderMarksTable('CSE301');
+
+// ── MY STUDENTS ──
+function renderMyStudents(data) {
+  document.getElementById('myStudentsTbody').innerHTML = data.map(s => `
+    <tr>
+      <td><strong>${s.name}</strong></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted)">${s.roll}</td>
+      <td>${s.sem}</td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:12px">${s.course}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:60px">
+            <div style="width:${s.att}%;height:100%;background:${s.att>=75?'var(--green)':'var(--red)'};border-radius:3px"></div>
+          </div>
+          <span style="font-size:12px;font-weight:600;color:${s.att>=75?'var(--green)':'var(--red)'}">${s.att}%</span>
+        </div>
+      </td>
+      <td>${s.internal}/25</td>
+      <td><span class="badge ${s.att>=75?'active':'low'}">${s.att>=75?'Good':'Low Att.'}</span></td>
+    </tr>
+  `).join('');
+}
+function filterMyStudents(q) {
+  renderMyStudents(myStudents.filter(s =>
+    s.name.toLowerCase().includes(q.toLowerCase()) || s.roll.toLowerCase().includes(q.toLowerCase())
+  ));
+}
+renderMyStudents(myStudents);
+
+// ── RESOURCES ──
+document.getElementById('resourceGrid').innerHTML = resources.map(r => `
+  <div class="resource-card">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="resource-icon" style="background:${r.bg};font-size:18px">${r.icon}</div>
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:0.06em">${r.type}</div>
+        <div style="font-size:13px;font-weight:600;margin-top:1px">${r.title}</div>
+      </div>
+    </div>
+    <div class="resource-meta">${r.course} · Uploaded ${r.date}</div>
+    <div class="resource-footer">
+      <span class="badge done">${r.course}</span>
+      <button class="btn-outline" style="padding:4px 12px;font-size:12px">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </button>
+    </div>
+  </div>
+`).join('');
+
+// ── NAVIGATION ──
+const titles = { dashboard:'Dashboard', courses:'My Courses', attendance:'Attendance', marks:'Marks Entry', students:'My Students', resources:'Resources', timetable:'Timetable', profile:'My Profile' };
+function navigate(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent = titles[page] || 'Dashboard';
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>
