@@ -155,10 +155,11 @@ function closeAllModals() {
 
 // ── SAVE (UPDATE + CREATE) ───────────────────────────────────
 async function handleSave() {
-  // Check if this is a marks, course, faculty, or student modal
+  // Check if this is a marks, course, faculty, department, or student modal
   const isMarksForm = document.getElementById('internal_marks') !== null;
   const isCourseForm = document.getElementById('course_code') !== null && !isMarksForm;
   const isFacultyForm = document.getElementById('faculty_name') !== null;
+  const isDeptForm = document.getElementById('dept_name') !== null && !isCourseForm && !isFacultyForm;
   
   if (isMarksForm) {
     return handleSaveMarks();
@@ -166,6 +167,14 @@ async function handleSave() {
 
   if (isCourseForm) {
     return handleSaveCourse();
+  }
+
+  if (isFacultyForm) {
+    return handleSaveFaculty();
+  }
+
+  if (isDeptForm) {
+    return handleSaveDept();
   }
   
   if (isFacultyForm) {
@@ -243,10 +252,11 @@ async function handleSave() {
 
 // ── DELETE ───────────────────────────────────────────────────
 async function handleDelete() {
-  // Check if this is a marks, course, faculty, or student delete
+  // Check if this is a marks, course, faculty, department, or student delete
   const isMarksDelete = window.deletingMarkId !== null && window.deletingMarkId !== undefined;
   const isCourseDelete = window.deletingCourseCode !== null && window.deletingCourseCode !== undefined;
   const isFacultyDelete = window.deletingFacultyId !== null && window.deletingFacultyId !== undefined;
+  const isDeptDelete = window.deletingDeptId !== null && window.deletingDeptId !== undefined;
   
   if (isMarksDelete) {
     return handleDeleteMarks();
@@ -258,6 +268,10 @@ async function handleDelete() {
   
   if (isFacultyDelete) {
     return handleDeleteFaculty();
+  }
+
+  if (isDeptDelete) {
+    return handleDeleteDept();
   }
 
   try {
@@ -1034,6 +1048,188 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+// ──────────────────────────────────────────────────────────────
+// DEPARTMENT FUNCTIONS
+// ──────────────────────────────────────────────────────────────
+
+// Load all departments and display in table
+async function loadDepartments() {
+  try {
+    const res = await fetch('/api/departments');
+    const data = await res.json();
+
+    const tbody = document.getElementById('dept-tbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    data.forEach(dept => {
+      const row = `
+<tr>
+  <td>${dept.dept_id}</td>
+  <td><b>${dept.dept_name}</b></td>
+  <td>${dept.building_location || 'N/A'}</td>
+  <td>${dept.student_count}</td>
+  <td>${dept.course_count}</td>
+  <td><span class="tag active">Active</span></td>
+  <td>
+    <div class="action-btns">
+      <button class="btn-edit" onclick="openEditDeptModal(${dept.dept_id})">Edit</button>
+      <button class="btn-del" onclick="openDeleteDeptModal(${dept.dept_id})">Delete</button>
+    </div>
+  </td>
+</tr>
+`;
+      tbody.innerHTML += row;
+    });
+  } catch (err) {
+    console.error('Error loading departments:', err);
+    showToast('❌ Error loading departments');
+  }
+}
+
+// Open modal to add new department
+function openAddDeptModal() {
+  window.editingDeptId = null;
+  
+  document.getElementById('modal-title').textContent = 'Add Department';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label>Department Name</label>
+      <input type="text" id="dept_name" placeholder="e.g., Computer Science & Engineering" required>
+    </div>
+
+    <div class="form-group">
+      <label>Building Location</label>
+      <input type="text" id="dept_location" placeholder="e.g., Block A, 3rd Floor">
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// Open modal to edit department
+function openEditDeptModal(deptId) {
+  window.editingDeptId = deptId;
+
+  const rows = document.querySelectorAll('#dept-tbody tr');
+  let selectedRow;
+
+  rows.forEach(row => {
+    const id = row.children[0].textContent.trim();
+    if (id == deptId) {
+      selectedRow = row;
+    }
+  });
+
+  if (!selectedRow) return;
+
+  const deptName = selectedRow.children[1].textContent.trim();
+  const location = selectedRow.children[2].textContent.trim();
+
+  document.getElementById('modal-title').textContent = 'Edit Department';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label>Department Name</label>
+      <input type="text" id="dept_name" value="${deptName}" required>
+    </div>
+
+    <div class="form-group">
+      <label>Building Location</label>
+      <input type="text" id="dept_location" value="${location === 'N/A' ? '' : location}">
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// Open delete confirmation modal
+function openDeleteDeptModal(deptId) {
+  window.deletingDeptId = deptId;
+  
+  document.getElementById('delete-msg').innerHTML =
+    "Are you sure you want to delete this department? This action cannot be undone.";
+
+  document.getElementById('delete-overlay').classList.add('open');
+}
+
+// Save department (create or update)
+async function handleSaveDept() {
+  const deptName = document.getElementById('dept_name').value;
+  const deptLocation = document.getElementById('dept_location').value;
+
+  if (!deptName) {
+    showToast("❌ Please enter department name");
+    return;
+  }
+
+  const data = {
+    dept_name: deptName,
+    building_location: deptLocation || null
+  };
+
+  try {
+    let response;
+
+    if (window.editingDeptId) {
+      // UPDATE
+      response = await fetch(`/api/departments/${window.editingDeptId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+    } else {
+      // CREATE
+      response = await fetch(`/api/departments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+    }
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      showToast("❌ " + result.error);
+      return;
+    }
+
+    showToast(window.editingDeptId ? "✅ Department updated" : "✅ Department added");
+    closeAllModals();
+    loadDepartments();
+
+  } catch (err) {
+    console.error(err);
+    showToast("❌ Error saving department");
+  }
+}
+
+// Delete department
+async function handleDeleteDept() {
+  if (!window.deletingDeptId) return;
+
+  try {
+    const response = await fetch(`/api/departments/${window.deletingDeptId}`, {
+      method: "DELETE"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      showToast("❌ " + result.error);
+      return;
+    }
+
+    showToast("✅ Department deleted");
+    closeAllModals();
+    loadDepartments();
+
+  } catch (err) {
+    console.error(err);
+    showToast("❌ Error deleting department");
+  }
+}
+
 // ── ENROLLMENT CHART ────────────────────────────────────────
 function drawEnrollmentChart() {
   const canvas = document.getElementById('enrollChart');
@@ -1093,5 +1289,6 @@ window.onload = function () {
   loadFaculty();
   loadCourses();
   loadMarks();
+  loadDepartments();
   drawEnrollmentChart();
 };

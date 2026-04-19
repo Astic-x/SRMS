@@ -200,7 +200,7 @@ app.get('/api/faculty', async (req, res) => {
             f.faculty_id,
             f.name,
             f.designation,
-            f.dept_id
+            f.dept_id,
             d.dept_name
         FROM Faculty f
         LEFT JOIN Department d ON f.dept_id = d.dept_id
@@ -422,6 +422,95 @@ app.delete('/api/courses/:code', async (req, res) => {
         }
 
         res.json({ message: 'Course deleted successfully' });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ==========================================
+// Department Endpoints
+// ==========================================
+
+// GET all departments
+app.get('/api/departments', async (req, res) => {
+    try {
+        const [rows] = await db.execute(`
+            SELECT 
+                d.dept_id,
+                d.dept_name,
+                d.building_location,
+                COUNT(DISTINCT f.faculty_id) as faculty_count,
+                COUNT(DISTINCT s.student_id) as student_count,
+                COUNT(DISTINCT c.course_code) as course_count
+            FROM Department d
+            LEFT JOIN Faculty f ON d.dept_id = f.dept_id
+            LEFT JOIN Student s ON d.dept_id = s.dept_id
+            LEFT JOIN Course c ON d.dept_id = c.dept_id
+            GROUP BY d.dept_id, d.dept_name, d.building_location
+        `);
+
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST: Create a new department
+app.post('/api/departments', async (req, res) => {
+    const { dept_name, building_location } = req.body;
+
+    try {
+        await db.execute(`
+            INSERT INTO Department 
+            (dept_name, building_location)
+            VALUES (?, ?)
+        `, [dept_name, building_location]);
+
+        res.json({ message: 'Department added successfully' });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// PUT: Update department by ID
+app.put('/api/departments/:id', async (req, res) => {
+    const { id } = req.params;
+    const { dept_name, building_location } = req.body;
+
+    try {
+        const result = await db.execute(`
+            UPDATE Department 
+            SET dept_name = ?, building_location = ?
+            WHERE dept_id = ?
+        `, [dept_name, building_location, id]);
+
+        if (result[0].affectedRows === 0) {
+            return res.status(404).json({ error: 'Department not found' });
+        }
+
+        res.json({ message: 'Department updated successfully' });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// DELETE: Delete department by ID
+app.delete('/api/departments/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await db.execute(`
+            DELETE FROM Department WHERE dept_id = ?
+        `, [id]);
+
+        if (result[0].affectedRows === 0) {
+            return res.status(404).json({ error: 'Department not found' });
+        }
+
+        res.json({ message: 'Department deleted successfully' });
 
     } catch (err) {
         res.status(500).json({ error: err.message });
