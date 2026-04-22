@@ -271,9 +271,20 @@
       <div id="page-students" class="page">
         <div class="section-header">
           <h3>Students</h3>
+          
           <div class="search-wrap">
+            <select class="search-col-filter" style="padding:4px;border:1px solid #cbd5e1;border-radius:4px;" onchange="filterTable('students-tbody', this.nextElementSibling.value, this.value)">
+              <option value="all">All Columns</option>
+              <option value="0">Student ID</option>
+              <option value="1">Name</option>
+              <option value="2">Department</option>
+              <option value="3">Semester</option>
+              <option value="4">Attendance</option>
+              <option value="5">Status</option>
+            </select>
             <input type="text" class="search-input" placeholder="🔍 Search students..."
-              oninput="filterTable('students-tbody',this.value)">
+              oninput="filterTable('students-tbody', this.value, this.previousElementSibling.value)">
+
             <button class="btn-primary" onclick="openAddModal()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -297,110 +308,28 @@
               </tr>
             </thead>
             <tbody id="students-tbody">
-              <tr>
-                <td>CSE2021001</td>
-                <td><b>Aarav Sharma</b></td>
-                <td>CSE</td>
-                <td>6th</td>
-                <td>91%</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit" style="background:#2563eb;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openEditModal('student','Aarav Sharma')">Edit</button><button class="btn-del" style="background:#ef4444;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openDeleteModal('Aarav Sharma', 1)">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>ECE2021042</td>
-                <td><b>Priya Rawat</b></td>
-                <td>ECE</td>
-                <td>6th</td>
-                <td>78%</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit" style="background:#2563eb;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openEditModal('student','Priya Rawat')">Edit</button><button class="btn-del" style="background:#ef4444;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openDeleteModal('Priya Rawat', 2)">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>ME2022015</td>
-                <td><b>Rohan Bisht</b></td>
-                <td>ME</td>
-                <td>4th</td>
-                <td>65%</td>
-                <td><span class="tag inactive">Inactive</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit" style="background:#2563eb;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openEditModal('student','Rohan Bisht')">Edit</button><button class="btn-del" style="background:#ef4444;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openDeleteModal('Rohan Bisht', 3)">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>CSE2022088</td>
-                <td><b>Sneha Gupta</b></td>
-                <td>CSE</td>
-                <td>4th</td>
-                <td>88%</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit" style="background:#2563eb;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openEditModal('student','Sneha Gupta')">Edit</button><button class="btn-del" style="background:#ef4444;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openDeleteModal('Sneha Gupta', 4)">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>IT2021033</td>
-                <td><b>Karan Negi</b></td>
-                <td>IT</td>
-                <td>6th</td>
-                <td>94%</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit" style="background:#2563eb;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openEditModal('student','Karan Negi')">Edit</button><button class="btn-del" style="background:#ef4444;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openDeleteModal('Karan Negi', 5)">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>CIVIL2023010</td>
-                <td><b>Ananya Verma</b></td>
-                <td>Civil</td>
-                <td>2nd</td>
-                <td>82%</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit" style="background:#2563eb;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openEditModal('student','Ananya Verma')">Edit</button><button class="btn-del" style="background:#ef4444;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openDeleteModal('Ananya Verma', 6)">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>BT2022057</td>
-                <td><b>Vikram Joshi</b></td>
-                <td>BT</td>
-                <td>4th</td>
-                <td>71%</td>
-                <td><span class="tag inactive">Inactive</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit" style="background:#2563eb;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openEditModal('student','Vikram Joshi')">Edit</button><button class="btn-del" style="background:#ef4444;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openDeleteModal('Vikram Joshi', 7)">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>ECE2023021</td>
-                <td><b>Divya Thapa</b></td>
-                <td>ECE</td>
-                <td>2nd</td>
-                <td>86%</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit" style="background:#2563eb;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openEditModal('student','Divya Thapa')">Edit</button><button class="btn-del" style="background:#ef4444;color:white;padding:8px 18px;border-radius:10px;border:none;font-weight:600;cursor:pointer;"
-                      onclick="openDeleteModal('Divya Thapa', 8)">Delete</button></div>
-                </td>
-              </tr>
+
+              <% if (typeof students !== 'undefined' && students.length > 0) { %>
+                <% students.forEach(student => { %>
+                  <tr>
+                    <td><%= student.student_id %></td>
+                    <td><b><%= student.name %></b></td>
+                    <td><%= student.dept_name %></td>
+                    <td><%= student.current_semester %></td>
+                    <td><%= student.attendance_percent ?? 0 %>%</td>
+                    <td><span class="tag active">Active</span></td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn-edit" onclick='openEditModal(<%- JSON.stringify(student) %>)'>Edit</button>
+                        <button class="btn-del" onclick="openDeleteModal(<%= student.student_id %>)">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="7" style="text-align:center;">No students found</td></tr>
+              <% } %>
+
             </tbody>
           </table>
           <div class="pagination">
@@ -416,9 +345,19 @@
       <div id="page-faculty" class="page">
         <div class="section-header">
           <h3>Faculty</h3>
+          
           <div class="search-wrap">
+            <select class="search-col-filter" style="padding:4px;border:1px solid #cbd5e1;border-radius:4px;" onchange="filterTable('faculty-tbody', this.nextElementSibling.value, this.value)">
+              <option value="all">All Columns</option>
+              <option value="0">Faculty ID</option>
+              <option value="1">Name</option>
+              <option value="2">Department</option>
+              <option value="3">Designation</option>
+              <option value="4">Status</option>
+            </select>
             <input type="text" class="search-input" placeholder="🔍 Search faculty..."
-              oninput="filterTable('faculty-tbody',this.value)">
+              oninput="filterTable('faculty-tbody', this.value, this.previousElementSibling.value)">
+
             <button class="btn-primary" onclick="openAddFacultyModal()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -441,7 +380,27 @@
               </tr>
             </thead>
             <tbody id="faculty-tbody">
-              <!-- Faculty data loads dynamically -->
+
+              <% if (typeof faculty !== 'undefined' && faculty.length > 0) { %>
+                <% faculty.forEach(fac => { %>
+                  <tr>
+                    <td><%= fac.faculty_id %></td>
+                    <td><b><%= fac.name %></b></td>
+                    <td><%= fac.dept_name %></td>
+                    <td><%= fac.designation %></td>
+                    <td><span class="tag active">Active</span></td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn-edit" onclick='openEditFacultyModal(<%- JSON.stringify(fac) %>)'>Edit</button>
+                        <button class="btn-del" onclick="openDeleteFacultyModal(<%= fac.faculty_id %>)">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="6" style="text-align:center;">No faculty members found</td></tr>
+              <% } %>
+
             </tbody>
           </table>
         </div>
@@ -451,9 +410,19 @@
       <div id="page-courses" class="page">
         <div class="section-header">
           <h3>Courses</h3>
+          
           <div class="search-wrap">
+            <select class="search-col-filter" style="padding:4px;border:1px solid #cbd5e1;border-radius:4px;" onchange="filterTable('courses-tbody', this.nextElementSibling.value, this.value)">
+              <option value="all">All Columns</option>
+              <option value="0">Course Code</option>
+              <option value="1">Course Name</option>
+              <option value="2">Department</option>
+              <option value="3">Credits</option>
+              <option value="4">Faculty</option>
+            </select>
             <input type="text" class="search-input" placeholder="🔍 Search courses..."
-              oninput="filterTable('courses-tbody',this.value)">
+              oninput="filterTable('courses-tbody', this.value, this.previousElementSibling.value)">
+
             <button class="btn-primary" onclick="openAddCourseModal()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -477,7 +446,28 @@
               </tr>
             </thead>
             <tbody id="courses-tbody">
-              <!-- Course data loads dynamically from API -->
+
+              <% if (typeof courses !== 'undefined' && courses.length > 0) { %>
+                <% courses.forEach(course => { %>
+                  <tr>
+                    <td><%= course.course_code %></td>
+                    <td><b><%= course.course_name %></b></td>
+                    <td><%= course.dept_name %></td>
+                    <td><%= course.credits %></td>
+                    <td><%= course.faculty_name || 'Unassigned' %></td>
+                    <td><span class="tag blue">Core</span></td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn-edit" onclick='openEditCourseModal(<%- JSON.stringify(course) %>)'>Edit</button>
+                        <button class="btn-del" onclick="openDeleteCourseModal('<%= course.course_code %>')">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="7" style="text-align:center;">No courses found</td></tr>
+              <% } %>
+
             </tbody>
           </table>
           <div class="pagination">
@@ -492,14 +482,28 @@
       <div id="page-marks" class="page">
         <div class="section-header">
           <h3>Marks / Grades</h3>
+          
           <div class="search-wrap">
+            <select class="search-col-filter" style="padding:4px;border:1px solid #cbd5e1;border-radius:4px;" onchange="filterTable('marks-tbody', this.nextElementSibling.value, this.value)">
+              <option value="all">All Columns</option>
+              <option value="0">Roll No.</option>
+              <option value="1">Student Name</option>
+              <option value="2">Course Code</option>
+              <option value="6">Calculated Grade</option>
+            </select>
             <input type="text" class="search-input" placeholder="🔍 Search records..."
-              oninput="filterTable('marks-tbody',this.value)">
-            <select class="select-sm">
-              <option>All Semesters</option>
-              <option>2nd</option>
-              <option>4th</option>
-              <option>6th</option>
+              oninput="filterTable('marks-tbody', this.value, this.previousElementSibling.value)">
+
+            <select class="select-sm" onchange="filterMarksBySemester(this.value)">
+              <option value="all">All Semesters</option>
+              <option value="1">1st</option>
+              <option value="2">2nd</option>
+              <option value="3">3rd</option>
+              <option value="4">4th</option>
+              <option value="5">5th</option>
+              <option value="6">6th</option>
+              <option value="7">7th</option>
+              <option value="8">8th</option>
             </select>
             <button class="btn-primary" onclick="openAddMarksModal()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -525,7 +529,34 @@
               </tr>
             </thead>
             <tbody id="marks-tbody">
-              <!-- Marks data loads dynamically from API -->
+
+              <% if (typeof marks !== 'undefined' && marks.length > 0) { %>
+                <% marks.forEach(mark => { 
+                    const gradeClass = mark.grade === 'A+' || mark.grade === 'A' ? 'green' :
+                                     mark.grade === 'B+' || mark.grade === 'B' ? 'blue' :
+                                     mark.grade === 'C' ? 'orange' : 'red';
+                %>
+                  <tr>
+                    <td><%= mark.student_id %></td>
+                    <td><b><%= mark.student_name %></b></td>
+                    <td><%= mark.course_code %></td>
+                    <td><%= mark.internal_marks %>/40</td>
+                    <td><%= mark.external_marks %>/60</td>
+                    <td><%= mark.total_marks %>/100</td>
+                    <td><span class="tag <%= gradeClass %>"><%= mark.grade %></span></td>
+                    <td class="mark-sem" style="display:none;"><%= mark.current_semester %></td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn-edit" onclick='openEditMarksModal(<%- JSON.stringify(mark) %>)'>Edit</button>
+                        <button class="btn-del" onclick="openDeleteMarksModal(<%= mark.enrollment_id %>)">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="8" style="text-align:center;">No records found</td></tr>
+              <% } %>
+
             </tbody>
           </table>
         </div>
@@ -535,9 +566,17 @@
       <div id="page-departments" class="page">
         <div class="section-header">
           <h3>Departments</h3>
+          
           <div class="search-wrap">
+            <select class="search-col-filter" style="padding:4px;border:1px solid #cbd5e1;border-radius:4px;" onchange="filterTable('dept-tbody', this.nextElementSibling.value, this.value)">
+              <option value="all">All Columns</option>
+              <option value="0">Code</option>
+              <option value="1">Department Name</option>
+              <option value="2">Location</option>
+            </select>
             <input type="text" class="search-input" placeholder="🔍 Search departments..."
-              oninput="filterTable('dept-tbody',this.value)">
+              oninput="filterTable('dept-tbody', this.value, this.previousElementSibling.value)">
+
             <button class="btn-primary" onclick="openAddDeptModal()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -561,90 +600,35 @@
               </tr>
             </thead>
             <tbody id="dept-tbody">
-              <tr>
-                <td>CSE</td>
-                <td><b>Computer Science & Engineering</b></td>
-                <td>Dr. Anand Mehta</td>
-                <td>380</td>
-                <td>24</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit"
-                      onclick="openEditModal('department','CSE')">Edit</button><button class="btn-del"
-                      onclick="openDeleteModal('CSE')">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>ECE</td>
-                <td><b>Electronics & Communication Engg.</b></td>
-                <td>Prof. Sunita Rao</td>
-                <td>218</td>
-                <td>18</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit"
-                      onclick="openEditModal('department','ECE')">Edit</button><button class="btn-del"
-                      onclick="openDeleteModal('ECE')">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>ME</td>
-                <td><b>Mechanical Engineering</b></td>
-                <td>Dr. Rajesh Pant</td>
-                <td>195</td>
-                <td>20</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit"
-                      onclick="openEditModal('department','ME')">Edit</button><button class="btn-del"
-                      onclick="openDeleteModal('ME')">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>Civil</td>
-                <td><b>Civil Engineering</b></td>
-                <td>Dr. Manoj Kumar</td>
-                <td>175</td>
-                <td>16</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit"
-                      onclick="openEditModal('department','Civil')">Edit</button><button class="btn-del"
-                      onclick="openDeleteModal('Civil')">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>IT</td>
-                <td><b>Information Technology</b></td>
-                <td>Ms. Pooja Arora</td>
-                <td>160</td>
-                <td>15</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit"
-                      onclick="openEditModal('department','IT')">Edit</button><button class="btn-del"
-                      onclick="openDeleteModal('IT')">Delete</button></div>
-                </td>
-              </tr>
-              <tr>
-                <td>BT</td>
-                <td><b>Biotechnology</b></td>
-                <td>Dr. Neha Singh</td>
-                <td>120</td>
-                <td>14</td>
-                <td><span class="tag active">Active</span></td>
-                <td>
-                  <div class="action-btns"><button class="btn-edit"
-                      onclick="openEditModal('department','BT')">Edit</button><button class="btn-del"
-                      onclick="openDeleteModal('BT')">Delete</button></div>
-                </td>
-              </tr>
+
+              <% if (typeof departments !== 'undefined' && departments.length > 0) { %>
+                <% departments.forEach(dept => { %>
+                  <tr>
+                    <td><%= dept.dept_id %></td>
+                    <td><b><%= dept.dept_name %></b></td>
+                    <td><%= dept.building_location || 'N/A' %></td>
+                    <td><%= dept.student_count %></td>
+                    <td><%= dept.course_count %></td>
+                    <td><span class="tag active">Active</span></td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn-edit" onclick='openEditDeptModal(<%- JSON.stringify(dept) %>)'>Edit</button>
+                        <button class="btn-del" onclick="openDeleteDeptModal(<%= dept.dept_id %>)">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="7" style="text-align:center;">No departments found</td></tr>
+              <% } %>
+
             </tbody>
           </table>
         </div>
       </div>
 
       <!-- ═══ SETTINGS ═══ -->
+      
       <div id="page-settings" class="page">
         <div class="section-header">
           <h3>Settings</h3>
@@ -652,62 +636,329 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
           <div class="chart-card">
             <div class="chart-title" style="margin-bottom:18px;">Profile Settings</div>
-            <div class="form-group"><label>Full Name</label><input type="text" value="Admin User"></div>
-            <div class="form-group"><label>Email Address</label><input type="email" value="admin@srms.edu.in"></div>
-            <div class="form-group"><label>Phone</label><input type="text" value="+91 98765 43210"></div>
-            <div class="form-group"><label>Role</label><input type="text" value="Super Administrator" disabled
-                style="background:#f1f5f9;color:#64748b"></div>
-            <button class="btn-primary" style="margin-top:4px;"
-              onclick="showToast('Profile updated successfully!')">Save Changes</button>
+            <form id="profile-form" onsubmit="event.preventDefault(); handleSaveProfile()">
+              <div class="form-group"><label>Username (Login ID)</label><input type="text" id="set_username" required value="<%= typeof admin_user !== 'undefined' ? admin_user.login_id : 'admin' %>"></div>
+              <div class="form-group"><label>Role</label><input type="text" value="Super Administrator" disabled style="background:#f1f5f9;color:#64748b"></div>
+              <p style="font-size:12px; color:#64748b; margin-top:10px;">Note: Profile properties are strictly synced with the Users database table.</p>
+              <button class="btn-primary" style="margin-top:10px;" type="submit">Save Changes</button>
+            </form>
           </div>
+          
           <div class="chart-card">
             <div class="chart-title" style="margin-bottom:18px;">Change Password</div>
-            <div class="form-group"><label>Current Password</label><input type="password" placeholder="••••••••"></div>
-            <div class="form-group"><label>New Password</label><input type="password" placeholder="••••••••"></div>
-            <div class="form-group"><label>Confirm New Password</label><input type="password" placeholder="••••••••">
-            </div>
-            <button class="btn-primary" style="margin-top:4px;"
-              onclick="showToast('Password updated successfully!')">Update Password</button>
+            <form id="password-form" onsubmit="event.preventDefault(); handleSavePassword()">
+              <div class="form-group"><label>Current Password</label><input type="password" id="set_pw_current" placeholder="••••••••" required></div>
+              <div class="form-group"><label>New Password</label><input type="password" id="set_pw_new" placeholder="••••••••" required></div>
+              <div class="form-group"><label>Confirm New Password</label><input type="password" id="set_pw_confirm" placeholder="••••••••" required></div>
+              <button class="btn-primary" style="margin-top:4px;" type="submit">Update Password</button>
+            </form>
           </div>
+
           <div class="chart-card" style="grid-column:span 2">
             <div class="chart-title" style="margin-bottom:18px;">System Preferences</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-              <div class="form-group"><label>Academic Year</label><select class="select-sm" style="width:100%">
-                  <option>2024–25</option>
-                  <option>2023–24</option>
-                </select></div>
-              <div class="form-group"><label>Default Semester</label><select class="select-sm" style="width:100%">
-                  <option>6th</option>
-                  <option>4th</option>
-                  <option>2nd</option>
-                </select></div>
-              <div class="form-group"><label>Timezone</label><select class="select-sm" style="width:100%">
-                  <option>IST (UTC+5:30)</option>
-                  <option>UTC</option>
-                </select></div>
-            </div>
-            <button class="btn-primary" style="margin-top:4px;" onclick="showToast('Preferences saved!')">Save
-              Preferences</button>
+            <form id="preferences-form" onsubmit="event.preventDefault(); handleSavePreferences()">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                <div class="form-group"><label>Academic Year</label>
+                  <select id="pref_year" class="select-sm" style="width:100%">
+                    <option>2024–25</option>
+                    <option>2023–24</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Default Semester</label>
+                  <select id="pref_sem" class="select-sm" style="width:100%">
+                    <option>1st</option><option>2nd</option><option>3rd</option><option>4th</option><option>5th</option><option>6th</option><option>7th</option><option>8th</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Timezone</label>
+                  <select id="pref_tz" class="select-sm" style="width:100%">
+                    <option>IST (UTC+5:30)</option>
+                    <option>UTC</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn-primary" style="margin-top:4px;" type="submit">Save Preferences</button>
+            </form>
           </div>
         </div>
       </div>
-
     </div><!-- /content -->
   </main>
 
-  <!-- ─── Add/Edit Modal ─── -->
-  <div class="overlay" id="modal-overlay" onclick="closeModal(event)">
+  
+  <!-- ─── Student Modal ─── -->
+  <div class="overlay" id="student-modal" onclick="closeModal(event)">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="modal-title">Add Student</h3>
-        <button class="modal-close" onclick="closeAllModals()">✕</button>
+        <h3 id="student-modal-title">Add Student</h3>
+        <button type="button" class="modal-close" onclick="closeAllModals()">✕</button>
       </div>
-      <div id="modal-body"></div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
-        <button class="btn-save" onclick="handleSave()">Save</button>
-      </div>
+      <form id="student-form" onsubmit="event.preventDefault(); handleSaveStudent()">
+        <div class="modal-body" id="modal-body" style="padding:20px; max-height:400px; overflow-y:auto;">
+            <input type="hidden" id="student_id_field" value="">
+            
+            <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="stu_first_name" required maxlength="50" pattern="[A-Za-z ]+">
+            </div>
+
+            <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="stu_last_name" required maxlength="50" pattern="[A-Za-z ]+">
+            </div>
+
+            <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="stu_email" required maxlength="100">
+            </div>
+
+            <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="stu_phone" required pattern="[\\+]?[0-9]{10,14}" maxlength="15">
+            </div>
+
+            <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" id="stu_dob" required max="<%= new Date().toISOString().split('T')[0] %>">
+            </div>
+
+            <div class="form-group">
+            <label>Department</label>
+            <select id="stu_dept" required>
+                <option value="">-- Select --</option>
+                
+              <% if (typeof departments !== 'undefined') { %>
+                <% departments.forEach(d => { %>
+                  <option value="<%= d.dept_id %>"><%= d.dept_name %></option>
+                <% }) %>
+              <% } %>
+
+            </select>
+            </div>
+
+            <div class="form-group">
+            <label>Semester</label>
+            <input type="number" id="stu_semester" required min="1" max="8" value="1">
+            <script>
+                // Defaults to pref_sem if set
+                const pSem = localStorage.getItem('pref_sem');
+                if(pSem) {
+                    const mapped = parseInt(pSem);
+                    if(!isNaN(mapped)) document.getElementById('stu_semester').value = mapped;
+                }
+            </script>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:15px 20px; text-align:right;">
+            <button type="button" class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+            <button type="submit" class="btn-save">Save</button>
+        </div>
+      </form>
     </div>
+  </div>
+
+  <!-- ─── Faculty Modal ─── -->
+  <div class="overlay" id="faculty-modal" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="faculty-modal-title">Add Faculty</h3>
+        <button type="button" class="modal-close" onclick="closeAllModals()">✕</button>
+      </div>
+      <form id="faculty-form" onsubmit="event.preventDefault(); handleSaveFaculty()">
+        <div class="modal-body" style="padding:20px; max-height:400px; overflow-y:auto;">
+            <input type="hidden" id="faculty_id_field" value="">
+            
+            <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="fac_name" required maxlength="100">
+            </div>
+
+            <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="fac_email" required maxlength="100">
+            </div>
+
+            <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="fac_phone" required pattern="[\\+]?[0-9]{10,14}" maxlength="15">
+            </div>
+
+            <div class="form-group">
+            <label>Designation</label>
+            <input type="text" id="fac_designation" required maxlength="50">
+            </div>
+
+            <div class="form-group">
+            <label>Department</label>
+            <select id="fac_dept" required>
+                <option value="">-- Select --</option>
+                
+              <% if (typeof departments !== 'undefined') { %>
+                <% departments.forEach(d => { %>
+                  <option value="<%= d.dept_id %>"><%= d.dept_name %></option>
+                <% }) %>
+              <% } %>
+
+            </select>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:15px 20px; text-align:right;">
+            <button type="button" class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+            <button type="submit" class="btn-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── Course Modal ─── -->
+  <div class="overlay" id="course-modal" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="course-modal-title">Add Course</h3>
+        <button type="button" class="modal-close" onclick="closeAllModals()">✕</button>
+      </div>
+      <form id="course-form" onsubmit="event.preventDefault(); handleSaveCourse()">
+        <div class="modal-body" style="padding:20px; max-height:400px; overflow-y:auto;">
+            <input type="hidden" id="course_is_edit" value="false">
+            <div class="form-group">
+            <label>Course Code</label>
+            <input type="text" id="crs_code" required maxlength="10" pattern="[A-Z0-9]+">
+            </div>
+
+            <div class="form-group">
+            <label>Course Name</label>
+            <input type="text" id="crs_name" required maxlength="100">
+            </div>
+
+            <div class="form-group">
+            <label>Credits</label>
+            <input type="number" id="crs_credits" required min="1" max="10">
+            </div>
+
+            <div class="form-group">
+            <label>Department</label>
+            <select id="crs_dept" required onchange="filterFacultyDropdown()">
+                <option value="">-- Select --</option>
+                
+              <% if (typeof departments !== 'undefined') { %>
+                <% departments.forEach(d => { %>
+                  <option value="<%= d.dept_id %>"><%= d.dept_name %></option>
+                <% }) %>
+              <% } %>
+
+            </select>
+            </div>
+
+            <div class="form-group">
+            <label>Faculty (Optional)</label>
+            <select id="crs_faculty">
+                <option value="">-- Select Faculty --</option>
+                
+              <% if (typeof faculty !== 'undefined') { %>
+                <% faculty.forEach(f => { %>
+                  <option value="<%= f.faculty_id %>" data-dept="<%= f.dept_id %>"><%= f.name %></option>
+                <% }) %>
+              <% } %>
+
+            </select>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:15px 20px; text-align:right;">
+            <button type="button" class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+            <button type="submit" class="btn-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── Marks Modal ─── -->
+  <div class="overlay" id="marks-modal" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="marks-modal-title">Add Marks</h3>
+        <button type="button" class="modal-close" onclick="closeAllModals()">✕</button>
+      </div>
+      <form id="marks-form" onsubmit="event.preventDefault(); handleSaveMarks()">
+        <div class="modal-body" style="padding:20px; max-height:400px; overflow-y:auto;">
+            <input type="hidden" id="mrk_id_field" value="">
+            
+            
+            <div class="form-group" id="mrk_student_sg">
+            <label>Student</label>
+            <select id="mrk_student_id" required>
+                <option value="">-- Select Student --</option>
+                <% if (typeof students !== 'undefined') { %>
+                  <% students.forEach(s => { %>
+                    <option value="<%= s.student_id %>"><%= s.name %> (ID: <%= s.student_id %>)</option>
+                  <% }) %>
+                <% } %>
+            </select>
+            </div>
+
+            <div class="form-group" id="mrk_course_sg">
+            <label>Course</label>
+            <select id="mrk_course_code" required>
+                <option value="">-- Select Course --</option>
+                <% if (typeof courses !== 'undefined') { %>
+                  <% courses.forEach(c => { %>
+                    <option value="<%= c.course_code %>"><%= c.course_name %> (<%= c.course_code %>)</option>
+                  <% }) %>
+                <% } %>
+            </select>
+            </div>
+
+
+            <div class="form-group">
+            <label>Internal Marks (Out of 40)</label>
+            <input type="number" id="mrk_internal" required min="0" max="40" step="0.01" oninput="updateCalculatedGrade()">
+            </div>
+
+            <div class="form-group">
+            <label>External Marks (Out of 60)</label>
+            <input type="number" id="mrk_external" required min="0" max="60" step="0.01" oninput="updateCalculatedGrade()">
+            </div>
+
+            <div class="form-group">
+            <label>Calculated Grade</label>
+            <input type="text" id="mrk_grade" readonly placeholder="Auto-calculated" style="background:#f1f5f9;">
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:15px 20px; text-align:right;">
+            <button type="button" class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+            <button type="submit" class="btn-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── Department Modal ─── -->
+  <div class="overlay" id="dept-modal" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="dept-modal-title">Add Department</h3>
+        <button type="button" class="modal-close" onclick="closeAllModals()">✕</button>
+      </div>
+      <form id="dept-form" onsubmit="event.preventDefault(); handleSaveDept()">
+        <div class="modal-body" style="padding:20px; max-height:400px; overflow-y:auto;">
+            <input type="hidden" id="dpt_id_field" value="">
+            
+            <div class="form-group">
+            <label>Department Name</label>
+            <input type="text" id="dpt_name" required maxlength="100">
+            </div>
+
+            <div class="form-group">
+            <label>Building / Location</label>
+            <input type="text" id="dpt_loc" maxlength="100">
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:15px 20px; text-align:right;">
+            <button type="button" class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+            <button type="submit" class="btn-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   </div>
 
   <!-- ─── Delete Confirm Modal ─── -->

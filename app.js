@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const db = require('./db'); // Imports and tests the database connection
-const { comparePassword } = require('./hash');
+const { comparePassword, hashPassword } = require('./hash');
 const crypto = require('crypto');
 
 
@@ -165,8 +165,110 @@ app.post('/forgot-password', async (req, res) => {
 
 
 
+
+
+
+
 // Dashboard Placeholders
-app.get('/admin', (req, res) => res.render('admin'));
+app.get('/admin', async (req, res) => {
+    try {
+        const [students] = await db.execute(`
+            SELECT 
+                s.student_id,
+                s.first_name,
+                s.last_name,
+                s.email,
+                s.date_of_birth,
+                s.phone_number,
+                s.dept_id,
+                CONCAT(s.first_name, ' ', s.last_name) AS name,
+                s.current_semester,
+                d.dept_name,
+                ROUND(
+                  (SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) / 
+                  NULLIF(COUNT(a.attendance_id), 0)) * 100
+                ) AS attendance_percent
+            FROM Student s
+            LEFT JOIN Department d ON s.dept_id = d.dept_id
+            LEFT JOIN Attendance a ON s.student_id = a.student_id
+            GROUP BY s.student_id
+        `);
+
+        const [faculty] = await db.execute(`
+            SELECT 
+                f.faculty_id,
+                f.name,
+                f.email,
+                f.designation,
+                f.phone,
+                f.dept_id,
+                d.dept_name
+            FROM Faculty f
+            LEFT JOIN Department d ON f.dept_id = d.dept_id
+        `);
+
+        const [courses] = await db.execute(`
+            SELECT 
+                c.course_code,
+                c.course_name,
+                c.credits,
+                c.dept_id,
+                d.dept_name,
+                c.faculty_id,
+                f.name as faculty_name
+            FROM Course c
+            LEFT JOIN Department d ON c.dept_id = d.dept_id
+            LEFT JOIN Faculty f ON c.faculty_id = f.faculty_id
+        `);
+
+        const [departments] = await db.execute(`
+            SELECT 
+                d.dept_id,
+                d.dept_name,
+                d.building_location,
+                COUNT(DISTINCT f.faculty_id) as faculty_count,
+                COUNT(DISTINCT s.student_id) as student_count,
+                COUNT(DISTINCT c.course_code) as course_count
+            FROM Department d
+            LEFT JOIN Faculty f ON d.dept_id = f.dept_id
+            LEFT JOIN Student s ON d.dept_id = s.dept_id
+            LEFT JOIN Course c ON d.dept_id = c.dept_id
+            GROUP BY d.dept_id, d.dept_name, d.building_location
+        `);
+
+        const [marks] = await db.query(`
+            SELECT 
+                e.enrollment_id,
+                e.student_id,
+                e.course_code,
+                e.internal_marks,
+                e.external_marks,
+                (e.internal_marks + e.external_marks) as total_marks,
+                e.grade,
+                CONCAT(s.first_name, ' ', s.last_name) as student_name,
+                s.current_semester,
+                c.course_name,
+                d.dept_name
+            FROM Enrollment e
+            JOIN Student s ON e.student_id = s.student_id
+            JOIN Course c ON e.course_code = c.course_code
+            JOIN Department d ON c.dept_id = d.dept_id
+            ORDER BY s.first_name, c.course_code
+        `);
+
+        
+        let admin_user = { login_id: 'admin' };
+        if (req.session && req.session.userId) {
+            const [users] = await db.execute('SELECT login_id FROM Users WHERE user_id = ?', [req.session.userId]);
+            if (users.length > 0) admin_user = users[0];
+        }
+
+        res.render('admin', { students, faculty, courses, departments, marks, admin_user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading dashboard data.");
+    }
+});
 // GET all students
 app.get('/api/students', async (req, res) => {
     try {
@@ -574,7 +676,10 @@ app.post('/api/marks', async (req, res) => {
 
     } catch (err) {
         if (err.code === 'ER_DUP_ENTRY') {
-            return res.status(400).json({ error: 'Student already enrolled in this course' });
+            return res.status(400).json({ error: 'Duplicate Entry: Student is already enrolled in this course.' });
+        }
+        if (err.code === 'ER_NO_REFERENCED_ROW_2' || err.code === 'ER_NO_REFERENCED_ROW') {
+            return res.status(400).json({ error: 'Constraint Failed: The provided Student ID or Course Code does not exist in the database.' });
         }
         res.status(500).json({ error: err.message });
     }
@@ -691,8 +796,253 @@ function calculateGrade(total) {
 
 
 
-app.get('/faculty', (req, res) => res.render('faculty'));
-app.get('/student', (req, res) => res.send('<h2>Welcome Student</h2>'));
+// ==========================================
+// Middleware: Protect Faculty Routes
+// ==========================================
+function requireFaculty(req, res, next) {
+    if (req.session.userId && req.session.role === 'faculty') {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+// ==========================================
+// GET: Render Faculty Dashboard & Inject Data
+// ==========================================
+app.get('/faculty', requireFaculty, async (req, res) => {
+    try {
+        // 1. Fetch Faculty Profile
+        const [facRows] = await db.execute(`
+            SELECT f.faculty_id, f.name, f.email, f.phone, f.designation, d.dept_name 
+            FROM Faculty f 
+            JOIN Department d ON f.dept_id = d.dept_id 
+            WHERE f.user_id = ?
+        `, [req.session.userId]);
+        
+        const faculty = facRows[0];
+        if (!faculty) return res.status(404).send('Faculty profile not found.');
+
+        // 2. Fetch Assigned Courses
+        const [courses] = await db.execute(`
+            SELECT course_code, course_name, credits 
+            FROM Course WHERE faculty_id = ?
+        `, [faculty.faculty_id]);
+
+        const courseCodes = courses.map(c => c.course_code);
+
+        // 3. Fetch Enrolled Students & Attendance Stats
+        let myStudents = [];
+        let attendanceStats = [];
+        
+        if (courseCodes.length > 0) {
+            const placeholders = courseCodes.map(() => '?').join(',');
+            
+            const [studentRows] = await db.execute(`
+                SELECT s.student_id, CONCAT(s.first_name, ' ', s.last_name) AS name, 
+                       s.current_semester, e.course_code, e.internal_marks, e.external_marks
+                FROM Enrollment e
+                JOIN Student s ON e.student_id = s.student_id
+                WHERE e.course_code IN (${placeholders})
+            `, courseCodes);
+            myStudents = studentRows;
+
+            const [attRows] = await db.execute(`
+                SELECT student_id, course_code, 
+                       COUNT(*) as total_classes,
+                       SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present_classes
+                FROM Attendance
+                WHERE course_code IN (${placeholders})
+                GROUP BY student_id, course_code
+            `, courseCodes);
+            attendanceStats = attRows;
+        }
+
+        // 4. Fetch Uploaded Resources
+        const [resources] = await db.execute(`
+            SELECT r.resource_id, r.title, r.type, r.file_path, r.upload_date, r.course_code, c.course_name 
+            FROM Resources r
+            JOIN Course c ON r.course_code = c.course_code
+            WHERE r.faculty_id = ?
+            ORDER BY r.upload_date DESC
+        `, [faculty.faculty_id]);
+
+        // 5. Compile payload
+        const serverData = {
+            profile: faculty,
+            courses: courses,
+            myStudents: myStudents,
+            attendanceStats: attendanceStats,
+            resources: resources
+        };
+
+        res.render('faculty', { serverData: JSON.stringify(serverData), faculty: faculty });
+
+    } catch (error) {
+        console.error('Faculty Dashboard Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// ==========================================
+// POST APIs: Handle Faculty Actions
+// ==========================================
+
+
+// API: Fetch Attendance for a specific course and date
+app.get('/api/faculty/attendance', requireFaculty, async (req, res) => {
+    const { course_code, date } = req.query;
+    
+    try {
+        const [rows] = await db.execute(`
+            SELECT student_id, status 
+            FROM Attendance 
+            WHERE course_code = ? AND date = ?
+        `, [course_code, date]);
+        
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Fetch Attendance Error:', error);
+        res.status(500).json({ message: 'Error fetching attendance' });
+    }
+});
+// Save Attendance
+app.post('/api/faculty/attendance', requireFaculty, async (req, res) => {
+    const { course_code, date, attendance } = req.body;
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
+        for (let record of attendance) {
+            await connection.execute(`
+                INSERT INTO Attendance (student_id, course_code, date, status) 
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE status = ?
+            `, [record.student_id, course_code, date, record.status, record.status]);
+        }
+        await connection.commit();
+        res.status(200).json({ message: 'Success' });
+    } catch (error) {
+        await connection.rollback();
+        console.error('Attendance Save Error:', error);
+        res.status(500).json({ message: 'Error saving attendance' });
+    } finally {
+        connection.release();
+    }
+});
+
+// Save Marks
+app.post('/api/faculty/marks', requireFaculty, async (req, res) => {
+    const { course_code, marks } = req.body;
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
+        for (let record of marks) {
+            // Server-side safety check: Ensure no negatives and respect max limits
+            const internal = Math.min(Math.max(0, record.internal_marks), 40);
+            const external = Math.min(Math.max(0, record.external_marks), 60);
+            await connection.execute(`
+                UPDATE Enrollment 
+                SET internal_marks = ?, external_marks = ? 
+                WHERE student_id = ? AND course_code = ?
+            `, [record.internal_marks, record.external_marks, record.student_id, course_code]);
+        }
+        await connection.commit();
+        res.status(200).json({ message: 'Success' });
+    } catch (error) {
+        await connection.rollback();
+        console.error('Marks Save Error:', error);
+        res.status(500).json({ message: 'Error saving marks' });
+    } finally {
+        connection.release();
+    }
+});
+
+// Upload Resource
+app.post('/api/faculty/resource', requireFaculty, async (req, res) => {
+    const { course_code, type, title, file_path } = req.body;
+    try {
+        const [facRows] = await db.execute('SELECT faculty_id FROM Faculty WHERE user_id = ?', [req.session.userId]);
+        await db.execute(`
+            INSERT INTO Resources (course_code, faculty_id, title, type, file_path) 
+            VALUES (?, ?, ?, ?, ?)
+        `, [course_code, facRows[0].faculty_id, title, type, file_path]);
+        res.status(200).json({ message: 'Success' });
+    } catch (error) {
+        console.error('Resource Upload Error:', error);
+        res.status(500).json({ message: 'Error saving resource' });
+    }
+});
+
+// API: Edit Resource
+app.put('/api/faculty/resource/:id', requireFaculty, async (req, res) => {
+    const { id } = req.params;
+    const { course_code, type, title, file_path } = req.body;
+    
+    try {
+        // First, ensure the faculty member actually owns the resource they are trying to edit
+        const [facRows] = await db.execute('SELECT faculty_id FROM Faculty WHERE user_id = ?', [req.session.userId]);
+        const faculty_id = facRows[0].faculty_id;
+
+        const [result] = await db.execute(`
+            UPDATE Resources 
+            SET course_code = ?, type = ?, title = ?, file_path = ?
+            WHERE resource_id = ? AND faculty_id = ?
+        `, [course_code, type, title, file_path, id, faculty_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(403).json({ message: 'Unauthorized or resource not found.' });
+        }
+        res.status(200).json({ message: 'Success' });
+    } catch (error) {
+        console.error('Resource Edit Error:', error);
+        res.status(500).json({ message: 'Error updating resource' });
+    }
+});
+// API: Delete Resource
+app.delete('/api/faculty/resource/:id', requireFaculty, async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        // Ensure the faculty member owns the resource
+        const [facRows] = await db.execute('SELECT faculty_id FROM Faculty WHERE user_id = ?', [req.session.userId]);
+        const faculty_id = facRows[0].faculty_id;
+
+        const [result] = await db.execute(`
+            DELETE FROM Resources 
+            WHERE resource_id = ? AND faculty_id = ?
+        `, [id, faculty_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(403).json({ message: 'Unauthorized or resource not found.' });
+        }
+        
+        res.status(200).json({ message: 'Success' });
+    } catch (error) {
+        console.error('Resource Delete Error:', error);
+        res.status(500).json({ message: 'Error deleting resource' });
+    }
+});
+
+
+// API: Update Faculty Contact Info (Phone)
+app.put('/api/faculty/profile', requireFaculty, async (req, res) => {
+    const { phone } = req.body;
+    try {
+        await db.execute('UPDATE Faculty SET phone = ? WHERE user_id = ?', [phone, req.session.userId]);
+        res.status(200).json({ message: 'Profile updated successfully' });
+    } catch (err) {
+        console.error('Profile Update Error:', err);
+        res.status(500).json({ error: 'Error updating profile' });
+    }
+});
+
+// GET: Securely Logout
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) console.error('Session destruction error:', err);
+        res.redirect('/login'); // Send them back to the login screen
+    });
+});
 
 
 
@@ -707,6 +1057,68 @@ app.get('/student', (req, res) => res.send('<h2>Welcome Student</h2>'));
 
 
 
+
+
+
+
+
+
+
+
+
+app.get('/student', (req, res) => res.render('student'));
+
+
+
+
+
+
+
+// ==========================================
+// API Settings
+// ==========================================
+const bcrypt = require('bcrypt'); // Make sure we have it. Or define it if it's missing (wait, comparePassword is used above).
+
+app.put('/api/settings/password', async (req, res) => {
+    if (!req.session || !req.session.userId) return res.status(401).json({ error: 'Unauthorized Access' });
+    const { currentPassword, newPassword } = req.body;
+    
+    try {
+        const [rows] = await db.execute('SELECT password_hash FROM Users WHERE user_id = ?', [req.session.userId]);
+        if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
+        
+        const isMatch = await comparePassword(currentPassword, rows[0].password_hash);
+        if (!isMatch) return res.status(401).json({ error: 'Current password is incorrect' });
+        
+        // Hash and Update
+        const hash = await hashPassword(newPassword); // We assume hashPassword exists in app.js
+        await db.execute('UPDATE Users SET password_hash = ? WHERE user_id = ?', [hash, req.session.userId]);
+        
+        res.json({ message: 'Password updated successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// ==========================================
+// Profile Settings (Update Username)
+// ==========================================
+app.put('/api/settings/profile', async (req, res) => {
+    if (!req.session || !req.session.userId) return res.status(401).json({ error: 'Unauthorized Access' });
+    const { username } = req.body;
+    if (!username) return res.status(400).json({ error: 'Username is required' });
+    
+    try {
+        await db.execute('UPDATE Users SET login_id = ? WHERE user_id = ?', [username, req.session.userId]);
+        res.json({ message: 'Profile updated successfully' });
+    } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ error: 'Username is already taken by another user!' });
+        }
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRMS Student Dashboard - Interactive</title>
+    <link rel="stylesheet" href="/CSS/student.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="brand">
+            <h2>SRMS</h2>
+            <p>Student Record Management System</p>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-label">Main</div>
+            <div class="nav-item active" onclick="navigate('dashboard')">📋 Dashboard</div>
+            <div class="nav-item" onclick="navigate('courses')">📚 Course Selection</div>
+            <div class="nav-item" onclick="navigate('attendance')">📊 Attendance</div>
+            <div class="nav-item" onclick="navigate('marks')">📝 Marks / Grades</div>
+            
+            <div class="nav-label">Academic</div>
+            <div class="nav-item" onclick="navigate('timetable')">📅 Timetable</div>
+            <div class="nav-item" onclick="navigate('resources')">📁 Resources</div>
+        </div>
+        <div class="user-profile">
+            <div class="avatar">MD</div>
+            <div>
+                <div style="font-size: 14px; font-weight: 600;">Moksh Dhandariya</div>
+                <div style="font-size: 12px; color: var(--text-muted);">Roll No: 44 • CSE</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboard" class="page-section active">
+            <div class="header">
+                <h1>Overview Dashboard</h1>
+                <button class="btn" onclick="navigate('courses')">+ Enroll in Elective</button>
+            </div>
+            <div class="grid-4">
+                <div class="card">
+                    <div style="color: var(--text-muted); font-size: 14px;">Overall Attendance</div>
+                    <div class="stat-value">84%</div>
+                    <div class="text-green">↑ 2% vs last month</div>
+                </div>
+                <div class="card">
+                    <div style="color: var(--text-muted); font-size: 14px;">Total Credits</div>
+                    <div class="stat-value">112</div>
+                    <div class="text-green">On track to graduate</div>
+                </div>
+                <div class="card">
+                    <div style="color: var(--text-muted); font-size: 14px;">Current Semester</div>
+                    <div class="stat-value">6th</div>
+                    <div style="color: var(--text-muted); font-size: 13px;">B.Tech CSE</div>
+                </div>
+                <div class="card">
+                    <div style="color: var(--text-muted); font-size: 14px;">Upcoming Exams</div>
+                    <div class="stat-value" style="color: var(--warning);">2</div>
+                    <div style="color: var(--text-muted); font-size: 13px;">Next: Friday</div>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Today's Classes</h3>
+                        <button class="btn btn-outline" onclick="navigate('timetable')">Full Schedule</button>
+                    </div>
+                    <div class="list-item">
+                        <div><strong>09:00 AM</strong><br><span style="color: var(--text-muted); font-size: 13px;">Artificial Intelligence (Room 304)</span></div>
+                        <span class="badge safe">Upcoming</span>
+                    </div>
+                    <div class="list-item">
+                        <div><strong>11:30 AM</strong><br><span style="color: var(--text-muted); font-size: 13px;">Machine Learning Lab (Lab 2)</span></div>
+                        <span class="badge safe">Upcoming</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Recent Notices</h3>
+                    </div>
+                    <div class="list-item">
+                        <span style="font-size: 14px;">Mid-term marks updated for CS301</span>
+                    </div>
+                    <div class="list-item">
+                        <span style="font-size: 14px;">Last date for elective choice is Friday</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COURSE SELECTION SECTION -->
+        <div id="courses" class="page-section">
+            <div class="header">
+                <h1>Course Selection (Electives)</h1>
+            </div>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr><th>Course Code</th><th>Course Name</th><th>Credits</th><th>Available Seats</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>OE401</td><td>Cloud Computing</td><td>3</td><td>12/60</td><td><button class="btn" onclick="confirmEnrollment('Cloud Computing')">Enroll</button></td></tr>
+                        <tr><td>OE402</td><td>Cyber Security</td><td>3</td><td>5/60</td><td><button class="btn" onclick="confirmEnrollment('Cyber Security')">Enroll</button></td></tr>
+                        <tr><td>OE405</td><td>Internet of Things</td><td>3</td><td>Full</td><td><button class="btn btn-outline" disabled>Closed</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ATTENDANCE SECTION -->
+        <div id="attendance" class="page-section">
+            <div class="header">
+                <h1>Attendance Tracking</h1>
+            </div>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr><th>Subject Code</th><th>Subject Name</th><th>Classes Attended</th><th>Percentage</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CS301</td><td>Artificial Intelligence</td><td>38/42</td>
+                            <td>88% <div class="progress-bg"><div class="progress-fill" style="width: 88%;"></div></div></td>
+                            <td><span class="badge safe">Safe</span></td>
+                        </tr>
+                        <tr>
+                            <td>CS302</td><td>Compiler Design</td><td>35/42</td>
+                            <td>83% <div class="progress-bg"><div class="progress-fill" style="width: 83%;"></div></div></td>
+                            <td><span class="badge safe">Safe</span></td>
+                        </tr>
+                        <tr>
+                            <td>CS305</td><td>Machine Learning Lab</td><td>15/22</td>
+                            <td>68% <div class="progress-bg"><div class="progress-fill" style="width: 68%; background: #ef4444;"></div></div></td>
+                            <td><span class="badge warning">Low</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MARKS SECTION -->
+        <div id="marks" class="page-section">
+            <div class="header">
+                <h1>Marks & Grades</h1>
+                <button class="btn btn-outline" onclick="showToast('Transcript PDF is downloading...')">Download Transcript</button>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3>Semester 6 Internal Assessments</h3></div>
+                <table>
+                    <thead>
+                        <tr><th>Subject</th><th>Mid-Term (30)</th><th>Assignments (20)</th><th>Total Achieved</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Artificial Intelligence</td><td>26</td><td>18</td><td><strong>44/50</strong></td></tr>
+                        <tr><td>Compiler Design</td><td>24</td><td>19</td><td><strong>43/50</strong></td></tr>
+                        <tr><td>Computer Networks</td><td>27</td><td>20</td><td><strong>47/50</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RESOURCES SECTION -->
+        <div id="resources" class="page-section">
+            <div class="header"><h1>Learning Resources</h1></div>
+            <div class="card">
+                <div class="list-item">
+                    <div><strong>Neural Networks Notes.pdf</strong><br><span style="font-size: 13px; color: var(--text-muted);">Uploaded by Dr. Sharma (CS301)</span></div>
+                    <button class="btn btn-outline" onclick="showToast('Downloading Neural Networks Notes...')">Download ↓</button>
+                </div>
+                <div class="list-item">
+                    <div><strong>Assignment_3_Parser.docx</strong><br><span style="font-size: 13px; color: var(--text-muted);">Uploaded by Prof. Verma (CS302)</span></div>
+                    <button class="btn btn-outline" onclick="showToast('Downloading Assignment 3...')">Download ↓</button>
+                </div>
+                <div class="list-item">
+                    <div><strong>Lab_Manual_v2.pdf</strong><br><span style="font-size: 13px; color: var(--text-muted);">Uploaded by Dr. Singh (CS305)</span></div>
+                    <button class="btn btn-outline" onclick="showToast('Downloading Lab Manual...')">Download ↓</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIMETABLE SECTION -->
+        <div id="timetable" class="page-section">
+            <div class="header"><h1>Weekly Timetable</h1></div>
+            <div class="card">
+                <table>
+                    <thead><tr><th>Time</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th></tr></thead>
+                    <tbody>
+                        <tr><td>09:00 AM</td><td>AI (Room 304)</td><td>CN (Room 301)</td><td>AI (Room 304)</td><td>CD (Room 302)</td><td>CN (Room 301)</td></tr>
+                        <tr><td>10:00 AM</td><td>CD (Room 302)</td><td>AI (Room 304)</td><td>CD (Room 302)</td><td>CN (Room 301)</td><td>AI (Room 304)</td></tr>
+                        <tr><td>11:30 AM</td><td colspan="2" style="text-align: center; background: var(--bg-body);">ML Lab (Lab 2)</td><td>Library</td><td colspan="2" style="text-align: center; background: var(--bg-body);">CN Lab (Lab 1)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Enrollment Modal -->
+    <div class="modal-overlay" id="enrollModal">
+        <div class="modal">
+            <h3>Confirm Enrollment</h3>
+            <p>Are you sure you want to enroll in <strong id="modalCourseName"></strong>? This action will register this subject as your elective for Semester 6.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                <button class="btn" onclick="executeEnrollment()">Confirm & Enroll</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toastBox">Action Successful!</div>
+
+    <!-- Interactive JavaScript -->
+    <script src="/JS/student.js"></script>
+
+</body>
+</html>
